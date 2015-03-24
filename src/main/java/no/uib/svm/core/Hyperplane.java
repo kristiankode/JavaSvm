@@ -8,37 +8,39 @@ import org.jscience.mathematics.vector.Vector;
  */
 public class Hyperplane {
 
-    // input fields
     private final Vector<Real> weightVector;
-    private final Vector<Real> inputVector;
     private final Real bias;
 
-    // output
-    Real value;
-
-    @SuppressWarnings("unchecked")
-    public Hyperplane(Vector<Real> inputVector, Vector<Real> weightVector, Real bias) {
-        this.inputVector = inputVector;
+    /**
+     * Initializes a Hyperplane function with a weight vector and a bias
+     * @param weightVector
+     * @param bias
+     */
+    public Hyperplane(Vector<Real> weightVector, Real bias) {
         this.weightVector = weightVector;
         this.bias = bias;
+    }
 
-        Real dotProduct = inputVector.times(weightVector);
-        this.value = dotProduct.plus(bias);
+
+    /**
+     * Calculates the value for a specific input vector
+     * @param inputVector
+     * @return
+     */
+    public Real getValueForInput(Vector<Real> inputVector){
+        Real value = inputVector.times(weightVector);
+        value.plus(bias);
+
+        return value;
+
     }
 
     public Vector<Real> getWeightVector() {
         return weightVector;
     }
 
-    public Vector<Real> getInputVector() {
-        return inputVector;
-    }
-
     public Real getBias() {
         return bias;
     }
 
-    public Real getValue() {
-        return value;
-    }
 }
