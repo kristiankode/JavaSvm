@@ -1,4 +1,4 @@
-package no.uib.svm.core;
+package no.uib.svm.core.dataset;
 
 /**
  * This class represents a single feature of one data instance, i.e the a value for x on the x-axis.

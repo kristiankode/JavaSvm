@@ -1,4 +1,4 @@
-package no.uib.svm.core;
+package no.uib.svm.core.kernel;
 
 /**
  * Created by kristianhestetun on 24.03.15.
