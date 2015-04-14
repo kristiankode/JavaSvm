@@ -12,5 +12,11 @@ package no.uib.svm.core;
  */
 public class Machine {
 
+    /**
+     * Trains the machine with a set of data
+     */
+    public void train(DataSet trainingData){
+
+    }
 
 }
