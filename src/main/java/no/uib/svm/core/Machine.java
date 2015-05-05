@@ -1,5 +1,7 @@
 package no.uib.svm.core;
 
+import no.uib.svm.core.dataset.Sample;
+
 /**
  * Main class for SVM
  *
@@ -15,7 +17,7 @@ public class Machine {
     /**
      * Trains the machine with a set of data
      */
-    public void train(DataSet trainingData){
+    public void train(Sample trainingData){
 
     }
 
