@@ -111,6 +111,22 @@ public class TrainingWrapper {
         return availableSvmTypes;
     }
 
+    public SvmType getSelectedSvmType() {
+        return selectedSvmType;
+    }
+
+    public void setSelectedSvmType(SvmType selectedSvmType) {
+        this.selectedSvmType = selectedSvmType;
+    }
+
+    public Kernel getSelectedKernel() {
+        return selectedKernel;
+    }
+
+    public void setSelectedKernel(Kernel selectedKernel) {
+        this.selectedKernel = selectedKernel;
+    }
+
     public String getTrainingOutputFile() {
         return trainingOutputFile;
     }
