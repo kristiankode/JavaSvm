@@ -102,7 +102,7 @@ public class SUI extends Application implements Initializable {
     private void initKernelInput(){
         kernelInput.setItems(availableKernels());
 
-        svmTypeInput.getSelectionModel().selectedIndexProperty().addListener(
+        kernelInput.getSelectionModel().selectedIndexProperty().addListener(
                 new ChangeListener<Number>() {
                     @Override
                     public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
@@ -120,6 +120,8 @@ public class SUI extends Application implements Initializable {
                     }
                 }
         );
+
+        kernelInput.getSelectionModel().selectLast();
     }
 
     /**
