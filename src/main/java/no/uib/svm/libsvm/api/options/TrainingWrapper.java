@@ -10,6 +10,7 @@ import no.uib.svm.libsvm.core.svm_train;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Logger;
 
 /**
  * Created by kristianhestetun on 05.05.15.
@@ -17,6 +18,8 @@ import java.util.List;
  * The result is a model which can be used for prediction.
  */
 public class TrainingWrapper {
+
+    static final Logger logger = Logger.getLogger(String.valueOf(TrainingWrapper.class));
 
     // Usage: svm_train [options] training_set_file [model_file]\n
     private Kernel selectedKernel = new LinearKernel();
@@ -70,6 +73,7 @@ public class TrainingWrapper {
         updateTrainingParams();
         trainingEngine.setInput_file_name(inputFile);
         trainingEngine.read_problem();
+        logger.info("file loaded successfully");
     }
 
     public void train() throws IOException {
@@ -77,6 +81,7 @@ public class TrainingWrapper {
         if (isParametersValid()) {
             svm_model model =
                     svm.svm_train(trainingEngine.getProb(), trainingEngine.getParam());
+
             svm.svm_save_model(inputFile + ".model", model);
         }
     }
@@ -84,8 +89,10 @@ public class TrainingWrapper {
     public boolean isParametersValid() {
         String error = svm.svm_check_parameter(
                 trainingEngine.getProb(), trainingEngine.getParam());
-
-        return error != null;
+        if(error != null){
+            Logger.getAnonymousLogger().info("Parameters invalid: " + error);
+        }
+        return error == null;
     }
 
     public String getInputFile() {
