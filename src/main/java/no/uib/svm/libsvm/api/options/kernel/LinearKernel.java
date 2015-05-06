@@ -16,4 +16,9 @@ public class LinearKernel extends Kernel {
     public void fillSvmParameter(svm_parameter param) {
         // nothing to fill
     }
+
+    @Override
+    public String getName(){
+        return "Linear";
+    }
 }

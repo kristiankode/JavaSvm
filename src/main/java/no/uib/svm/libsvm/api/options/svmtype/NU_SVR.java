@@ -18,6 +18,10 @@ public class NU_SVR extends SvmType {
         param.nu = this.nu;
     }
 
+    @Override
+    public String getName() {
+        return "Nu SVR";
+    }
     private double C;    // for C_SVC, EPSILON_SVR and NU_SVR
     public double nu;    // for NU_SVC, ONE_CLASS, and NU_SVR
 

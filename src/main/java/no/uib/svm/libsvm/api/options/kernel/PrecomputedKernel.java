@@ -13,6 +13,11 @@ public class PrecomputedKernel extends Kernel {
     }
 
     @Override
+    public String getName() {
+        return "Precomputed";
+    }
+
+    @Override
     public void fillSvmParameter(svm_parameter param) {
 
     }

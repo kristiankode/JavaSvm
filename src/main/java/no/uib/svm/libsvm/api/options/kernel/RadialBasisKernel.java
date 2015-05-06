@@ -13,6 +13,11 @@ public class RadialBasisKernel extends Kernel {
     }
 
     @Override
+    public String getName() {
+        return "Radial basis";
+    }
+
+    @Override
     public void fillSvmParameter(svm_parameter param) {
         param.gamma = this.gamma;
     }

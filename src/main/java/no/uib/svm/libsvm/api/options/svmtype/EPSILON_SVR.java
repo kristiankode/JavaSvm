@@ -18,6 +18,11 @@ public class EPSILON_SVR extends SvmType {
         param.p = this.p;
     }
 
+    @Override
+    public String getName() {
+        return "Epsilon SVR";
+    }
+
     private double C;    // for C_SVC, EPSILON_SVR and NU_SVR
     public double p;    // for EPSILON_SVR
 

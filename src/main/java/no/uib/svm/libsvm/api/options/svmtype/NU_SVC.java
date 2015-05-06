@@ -17,6 +17,11 @@ public class NU_SVC extends SvmType {
         param.nu = this.nu;
     }
 
+    @Override
+    public String getName() {
+        return "Nu SVC";
+    }
+
     private double nu;    // for NU_SVC, ONE_CLASS, and NU_SVR
 
     public final static NU_SVC defaultNuSvc = new NU_SVC(

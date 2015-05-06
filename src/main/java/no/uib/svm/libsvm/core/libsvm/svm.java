@@ -1,6 +1,7 @@
 package no.uib.svm.libsvm.core.libsvm;
 import java.io.*;
 import java.util.*;
+import java.util.logging.Logger;
 
 //
 // Kernel Cache

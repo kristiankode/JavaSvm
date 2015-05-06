@@ -20,5 +20,14 @@ public abstract class Kernel {
 
     public abstract int getId();
 
+    public abstract String getName();
+
+    @Override
+    public String toString(){
+        return this.getName();
+    }
+
     public abstract void fillSvmParameter(svm_parameter param);
+
+
 }

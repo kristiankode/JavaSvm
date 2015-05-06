@@ -21,6 +21,12 @@ public abstract class SvmType {
     protected final static double[] DEFAULT_WEIGHT = new double[0];
 
     public abstract int getId();
+    public abstract String getName();
+
+    @Override
+    public String toString(){
+        return this.getName();
+    }
 
     public abstract void fillSvmParameter(svm_parameter param);
 }

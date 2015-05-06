@@ -29,6 +29,11 @@ public class PolynomialKernel extends Kernel {
         this.coef0 = coef0;
     }
 
+    @Override
+    public String getName(){
+        return "Polynomial";
+    }
+
     public final static PolynomialKernel defaultPolynomialKernel
             = new PolynomialKernel(DEFAULT_DEGREE, DEFAULT_GAMMA, DEFAULT_COEF0);
 

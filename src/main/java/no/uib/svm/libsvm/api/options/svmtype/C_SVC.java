@@ -13,6 +13,11 @@ public class C_SVC extends SvmType {
     }
 
     @Override
+    public String getName() {
+        return "C-SVC";
+    }
+
+    @Override
     public void fillSvmParameter(svm_parameter param) {
         param.C = this.C;
         param.nr_weight = this.nr_weight;

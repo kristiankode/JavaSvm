@@ -13,6 +13,11 @@ public class SigmoidKernel extends Kernel {
     }
 
     @Override
+    public String getName() {
+        return "Sigmoid";
+    }
+
+    @Override
     public void fillSvmParameter(svm_parameter param) {
         param.gamma = this.gamma;
         param.coef0 = this.coef0;
@@ -24,6 +29,10 @@ public class SigmoidKernel extends Kernel {
     public SigmoidKernel(double gamma, double coef0){
         this.gamma = gamma;
         this.coef0 = coef0;
+    }
+
+    public SigmoidKernel(){
+        this(DEFAULT_GAMMA, DEFAULT_COEF0);
     }
 
     public double getGamma() {
