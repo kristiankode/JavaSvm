@@ -24,12 +24,10 @@ import javafx.stage.Stage;
 import no.uib.svm.libsvm.api.options.TrainingWrapper;
 import no.uib.svm.libsvm.api.options.kernel.*;
 import no.uib.svm.libsvm.api.options.svmtype.*;
-import no.uib.svm.libsvm.core.libsvm.svm_parameter;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.util.DoubleSummaryStatistics;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
@@ -103,7 +101,7 @@ public class SUI extends Application implements Initializable {
     /**
      * Initializes the dropdown for selecting kernel
      */
-    private void initKernelInput(){
+    private void initKernelInput() {
         kernelInput.setItems(availableKernels());
 
         kernelInput.getSelectionModel().selectedIndexProperty().addListener(
@@ -131,7 +129,7 @@ public class SUI extends Application implements Initializable {
     /**
      * Initializes the dropdown for selecting svm-types
      */
-    private void initSvmTypeInput(){
+    private void initSvmTypeInput() {
         svmTypeInput.setItems(availableSvmTypes());
 
         svmTypeInput.getSelectionModel().selectedIndexProperty().addListener(
@@ -161,7 +159,7 @@ public class SUI extends Application implements Initializable {
         svmTypeInput.getSelectionModel().selectLast();
     }
 
-    private void handlePolynomialKernelSelected(PolynomialKernel kernel){
+    private void handlePolynomialKernelSelected(PolynomialKernel kernel) {
         updateInput(gammaInput, kernel.getGamma());
         updateInput(coef0Input, kernel.getCoef0());
         updateInput(degreeInput, kernel.getDegree());
@@ -170,26 +168,26 @@ public class SUI extends Application implements Initializable {
     /**
      * Takes data from the text input and stores it in a kernel object
      */
-    public void updateKernelParams(){
-        if(selectedKernel instanceof PolynomialKernel){
+    public void updateKernelParams() {
+        if (selectedKernel instanceof PolynomialKernel) {
             updatePolynomialKernel((PolynomialKernel) selectedKernel);
-        } else if(selectedKernel instanceof RadialBasisKernel){
+        } else if (selectedKernel instanceof RadialBasisKernel) {
             updateRadialBasisKernel((RadialBasisKernel) selectedKernel);
-        } else if(selectedKernel instanceof SigmoidKernel){
+        } else if (selectedKernel instanceof SigmoidKernel) {
             updateSigmoidKernel((SigmoidKernel) selectedKernel);
         }
     }
 
-    public void updateSVMTypeParams(){
-        if(selectedSvmType instanceof  C_SVC){
+    public void updateSVMTypeParams() {
+        if (selectedSvmType instanceof C_SVC) {
             updateCSVCType((C_SVC) selectedSvmType);
-        }else if(selectedSvmType instanceof  EPSILON_SVR){
+        } else if (selectedSvmType instanceof EPSILON_SVR) {
             updateEpsilonSVRType((EPSILON_SVR) selectedSvmType);
-        }else if(selectedSvmType instanceof  NU_SVC){
+        } else if (selectedSvmType instanceof NU_SVC) {
             updateNUSVCType((NU_SVC) selectedSvmType);
-        }else if(selectedSvmType instanceof NU_SVR){
+        } else if (selectedSvmType instanceof NU_SVR) {
             updateNUSVRType((NU_SVR) selectedSvmType);
-        }else if(selectedSvmType instanceof  OneClassSvm){
+        } else if (selectedSvmType instanceof OneClassSvm) {
             updateOneClassSVM((OneClassSvm) selectedSvmType);
         }
     }
@@ -215,13 +213,33 @@ public class SUI extends Application implements Initializable {
     private void updateCSVCType(C_SVC svm) {
         svm.setC(Double.parseDouble(paramC.getText())); //TODO: Check if correct
         svm.setNr_weight(Integer.parseInt(paramNrWeight.getText()));
-        //Need more!;
+        svm.setWeight(convertToDoubleArray(paramWeight.getText()));
+        svm.setWeight_label(convertToIntArray(paramWeightLabel.getText()));
+
     }
 
+    private int[] convertToIntArray(String text) {
+        String[] stringArray = text.split(",");
+        int[] array = new int[stringArray.length];
+        for (int i = 0; i < stringArray.length; i++) {
+            array[i] = Integer.parseInt(stringArray[i].trim());
+        }
+        return array;
+    }
+
+    private double[] convertToDoubleArray(String text) {
+        String[] stringArray = text.split(",");
+        double[] array = new double[stringArray.length];
+        for (int i = 0; i < stringArray.length; i++) {
+            array[i] = Double.parseDouble(stringArray[i].trim());
+        }
+        return array;
+    }
 
 
     /**
      * Takes data from the text inputs and stores it in a Sigmoid kernel Object
+     *
      * @param kernel
      */
     private void updateSigmoidKernel(SigmoidKernel kernel) {
@@ -232,6 +250,7 @@ public class SUI extends Application implements Initializable {
 
     /**
      * Takes data from the text input and stores it in a Radial Basis Kernel object
+     *
      * @param kernel
      */
     private void updateRadialBasisKernel(RadialBasisKernel kernel) {
@@ -240,24 +259,25 @@ public class SUI extends Application implements Initializable {
 
     /**
      * Takes data from the text inputs and stores it in a polynomial kernel object
+     *
      * @param kernel
      */
-    private void updatePolynomialKernel(PolynomialKernel kernel){
+    private void updatePolynomialKernel(PolynomialKernel kernel) {
         kernel.setCoef0(Double.parseDouble(coef0Input.getText()));
         kernel.setGamma(Double.parseDouble(gammaInput.getText()));
         kernel.setDegree(kernel.getDegree());
     }
 
-    private void handleRadialBasisKernelSelected(RadialBasisKernel kernel){
+    private void handleRadialBasisKernelSelected(RadialBasisKernel kernel) {
         updateInput(gammaInput, kernel.getGamma());
     }
 
-    private void handleSigmoidKernelSelected(SigmoidKernel kernel){
+    private void handleSigmoidKernelSelected(SigmoidKernel kernel) {
         updateInput(gammaInput, kernel.getGamma());
         updateInput(coef0Input, kernel.getCoef0());
     }
 
-    private void handleCsvcSelected(C_SVC svm){
+    private void handleCsvcSelected(C_SVC svm) {
         updateInput(paramC, svm.getC());
         updateInput(paramNrWeight, svm.getNr_weight());
         updateInput(paramWeight, svm.getWeight());
@@ -268,20 +288,21 @@ public class SUI extends Application implements Initializable {
         updateInput(paramNu, svm.getNu());
     }
 
-    private void handleOneClassSvmSelected(OneClassSvm svm){
+    private void handleOneClassSvmSelected(OneClassSvm svm) {
         updateInput(paramNu, svm.getNu());
     }
 
-    private void handleNuSvrSelected(NU_SVR svm){
+    private void handleNuSvrSelected(NU_SVR svm) {
         updateInput(paramNu, svm.getNu());
         updateInput(paramC, svm.getC());
     }
 
-    private void handleEpsilonSvrSelected(EPSILON_SVR svm){
+    private void handleEpsilonSvrSelected(EPSILON_SVR svm) {
         updateInput(paramP, svm.getP());
         updateInput(paramC, svm.getC());
     }
-    private void resetSvmParams(){
+
+    private void resetSvmParams() {
         clearInput(paramC);
         clearInput(paramNrWeight);
         clearInput(paramWeight);
@@ -290,29 +311,29 @@ public class SUI extends Application implements Initializable {
         clearInput(paramP);
     }
 
-    private void resetKernelParams(){
+    private void resetKernelParams() {
         clearInput(gammaInput);
         clearInput(coef0Input);
         clearInput(degreeInput);
     }
 
-    private void clearInput(TextField input){
+    private void clearInput(TextField input) {
         input.setText("");
         input.setDisable(true);
     }
 
-    private void updateInput(TextField input, Object value){
+    private void updateInput(TextField input, Object value) {
         input.setDisable(false);
         input.setText(String.valueOf(value));
     }
 
-    private void updateTrainingEngine(){
+    private void updateTrainingEngine() {
         trainingWrapper.setSelectedKernel(selectedKernel);
         trainingWrapper.setSelectedSvmType(selectedSvmType);
     }
 
     @FXML
-    public void startTraining(final ActionEvent e){
+    public void startTraining(final ActionEvent e) {
         updateTrainingEngine();
         try {
             trainingWrapper.train();
@@ -333,12 +354,12 @@ public class SUI extends Application implements Initializable {
     }
 
     @FXML
-    public ObservableList<Kernel> availableKernels(){
+    public ObservableList<Kernel> availableKernels() {
         return FXCollections.observableList(trainingWrapper.getAvailableKernels());
     }
 
     @FXML
-    public ObservableList<SvmType> availableSvmTypes(){
+    public ObservableList<SvmType> availableSvmTypes() {
         return FXCollections.observableList(trainingWrapper.getAvailableSvmTypes());
     }
 }
