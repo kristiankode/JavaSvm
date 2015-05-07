@@ -24,10 +24,12 @@ import javafx.stage.Stage;
 import no.uib.svm.libsvm.api.options.TrainingWrapper;
 import no.uib.svm.libsvm.api.options.kernel.*;
 import no.uib.svm.libsvm.api.options.svmtype.*;
+import no.uib.svm.libsvm.core.libsvm.svm_parameter;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.DoubleSummaryStatistics;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
@@ -172,8 +174,68 @@ public class SUI extends Application implements Initializable {
         if(selectedKernel instanceof PolynomialKernel){
             updatePolynomialKernel((PolynomialKernel) selectedKernel);
         } else if(selectedKernel instanceof RadialBasisKernel){
-            // update Radial basis kernel
-        } // ....
+            updateRadialBasisKernel((RadialBasisKernel) selectedKernel);
+        } else if(selectedKernel instanceof SigmoidKernel){
+            updateSigmoidKernel((SigmoidKernel) selectedKernel);
+        }
+    }
+
+    public void updateSVMTypeParams(){
+        if(selectedSvmType instanceof  C_SVC){
+            updateCSVCType((C_SVC) selectedSvmType);
+        }else if(selectedSvmType instanceof  EPSILON_SVR){
+            updateEpsilonSVRType((EPSILON_SVR) selectedSvmType);
+        }else if(selectedSvmType instanceof  NU_SVC){
+            updateNUSVCType((NU_SVC) selectedSvmType);
+        }else if(selectedSvmType instanceof NU_SVR){
+            updateNUSVRType((NU_SVR) selectedSvmType);
+        }else if(selectedSvmType instanceof  OneClassSvm){
+            updateOneClassSVM((OneClassSvm) selectedSvmType);
+        }
+    }
+
+    private void updateOneClassSVM(OneClassSvm svm) {
+        svm.setNu(Double.parseDouble(paramNu.getText())); //TODO: check if correct
+    }
+
+    private void updateNUSVRType(NU_SVR svm) {
+        svm.setNu(Double.parseDouble(paramNu.getText())); //TODO: check if correct
+        svm.setC(Double.parseDouble(paramC.getText())); //TODO: check if correct
+    }
+
+    private void updateNUSVCType(NU_SVC svm) {
+        svm.setNu(Double.parseDouble(paramNu.getText())); //TODO: check if correct
+    }
+
+    private void updateEpsilonSVRType(EPSILON_SVR svm) {
+        svm.setC(Double.parseDouble(paramC.getText())); //TODO: Check if correct
+        svm.setP(Double.parseDouble(paramP.getText())); //TODO: Check if correct
+    }
+
+    private void updateCSVCType(C_SVC svm) {
+        svm.setC(Double.parseDouble(paramC.getText())); //TODO: Check if correct
+        svm.setNr_weight(Integer.parseInt(paramNrWeight.getText()));
+        //Need more!;
+    }
+
+
+
+    /**
+     * Takes data from the text inputs and stores it in a Sigmoid kernel Object
+     * @param kernel
+     */
+    private void updateSigmoidKernel(SigmoidKernel kernel) {
+        kernel.setGamma(Double.parseDouble(gammaInput.getText()));
+        kernel.setCoef0(Double.parseDouble(coef0Input.getText()));
+    }
+
+
+    /**
+     * Takes data from the text input and stores it in a Radial Basis Kernel object
+     * @param kernel
+     */
+    private void updateRadialBasisKernel(RadialBasisKernel kernel) {
+        kernel.setGamma(Double.parseDouble(gammaInput.getText()));
     }
 
     /**
