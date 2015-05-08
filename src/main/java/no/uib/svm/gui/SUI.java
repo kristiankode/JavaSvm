@@ -38,11 +38,7 @@ public class SUI extends Application implements Initializable {
     }
 
     @FXML
-    private GridPane lol1;
-    @FXML
     private Label selectedInputFileLabel;
-    @FXML
-    private Button trainBtn;
     @FXML
     private ChoiceBox<Kernel> kernelInput;
     @FXML
@@ -328,6 +324,8 @@ public class SUI extends Application implements Initializable {
     }
 
     private void updateTrainingEngine() {
+        updateSVMTypeParams();
+        updateKernelParams();
         trainingWrapper.setSelectedKernel(selectedKernel);
         trainingWrapper.setSelectedSvmType(selectedSvmType);
     }
