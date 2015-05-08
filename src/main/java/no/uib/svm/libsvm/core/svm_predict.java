@@ -5,7 +5,7 @@ import no.uib.svm.libsvm.core.libsvm.*;
 import java.io.*;
 import java.util.StringTokenizer;
 
-class svm_predict {
+public class svm_predict {
 	private static svm_print_interface svm_print_null = new svm_print_interface()
 	{
 		public void print(String s) {}
@@ -36,7 +36,7 @@ class svm_predict {
 		return Integer.parseInt(s);
 	}
 
-	private static void predict(BufferedReader input, DataOutputStream output, svm_model model, int predict_probability) throws IOException
+	public static void predict(BufferedReader input, DataOutputStream output, svm_model model, int predict_probability) throws IOException
 	{
 		int correct = 0;
 		int total = 0;
