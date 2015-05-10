@@ -4,10 +4,7 @@ import no.uib.svm.libsvm.core.libsvm.svm;
 import no.uib.svm.libsvm.core.libsvm.svm_model;
 import no.uib.svm.libsvm.core.svm_predict;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.logging.Logger;
 
 /**
@@ -17,7 +14,8 @@ public class PredictionWrapper {
 
     private String
             modelFilePath,
-            testDataFilePath;
+            testDataFilePath,
+            outputFilePath;
     private svm_model model;
 
     private Boolean predictProbability = false;
@@ -26,11 +24,11 @@ public class PredictionWrapper {
         model = svm.svm_load_model(filePath);
     }
 
-    public void predict() {
+    public void predict() throws IOException {
         BufferedReader inputReader = getTestDataReader();
 
         svm_predict.predict(
-                inputReader, outputStream, this.model, predictProbability ? 1 : 0);
+                inputReader, getOutputStream(), this.model, booleanToInt(predictProbability));
     }
 
     public BufferedReader getTestDataReader() {
@@ -42,6 +40,31 @@ public class PredictionWrapper {
             }
         }
         return null;
+    }
+
+    private DataOutputStream getOutputStream() throws FileNotFoundException {
+        return new DataOutputStream(
+                new BufferedOutputStream(new FileOutputStream(outputFilePath)));
+    }
+
+    int booleanToInt(boolean bool) {
+        return bool ? 1 : 0;
+    }
+
+    public String getOutputFilePath() {
+        return outputFilePath;
+    }
+
+    public void setOutputFilePath(String outputFilePath) {
+        this.outputFilePath = outputFilePath;
+    }
+
+    public svm_model getModel() {
+        return model;
+    }
+
+    public void setModel(svm_model model) {
+        this.model = model;
     }
 
     public String getModelFilePath() {
@@ -60,4 +83,11 @@ public class PredictionWrapper {
         return testDataFilePath;
     }
 
+    public Boolean getPredictProbability() {
+        return predictProbability;
+    }
+
+    public void setPredictProbability(Boolean predictProbability) {
+        this.predictProbability = predictProbability;
+    }
 }

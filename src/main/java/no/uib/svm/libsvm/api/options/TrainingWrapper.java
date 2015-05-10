@@ -76,14 +76,22 @@ public class TrainingWrapper {
         logger.info("file loaded successfully");
     }
 
-    public void train() throws IOException {
+    /**
+     * Trains the model using the selected parameters.
+     * @return
+     * @throws IOException
+     */
+    public svm_model train() throws IOException {
         loadFile();
         if (isParametersValid()) {
             svm_model model =
                     svm.svm_train(trainingEngine.getProb(), trainingEngine.getParam());
 
             svm.svm_save_model(inputFile + ".model", model);
+
+            return model;
         }
+        return null;
     }
 
     public boolean isParametersValid() {

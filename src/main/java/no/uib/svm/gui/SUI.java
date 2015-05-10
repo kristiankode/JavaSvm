@@ -21,9 +21,11 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import no.uib.svm.libsvm.api.options.PredictionWrapper;
 import no.uib.svm.libsvm.api.options.TrainingWrapper;
 import no.uib.svm.libsvm.api.options.kernel.*;
 import no.uib.svm.libsvm.api.options.svmtype.*;
+import no.uib.svm.libsvm.core.libsvm.svm_model;
 
 import java.io.File;
 import java.io.IOException;
@@ -69,7 +71,18 @@ public class SUI extends Application implements Initializable {
     @FXML
     private TextField coef0Input;
 
+    // prediction-params
+    @FXML
+    private Label testDataLabel;
+    @FXML
+    private Label modelLabel;
+    private String predictionOutputFilePath;
+
+    @FXML
+    private Button predictBtn;
+
     private TrainingWrapper trainingWrapper;
+    private PredictionWrapper predictionWrapper;
     private Stage currentStage;
 
     private Kernel selectedKernel;
@@ -89,6 +102,7 @@ public class SUI extends Application implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
 
         trainingWrapper = new TrainingWrapper();
+        predictionWrapper = new PredictionWrapper();
 
         initKernelInput();
         initSvmTypeInput();
@@ -334,8 +348,12 @@ public class SUI extends Application implements Initializable {
     public void startTraining(final ActionEvent e) {
         updateTrainingEngine();
         try {
-            trainingWrapper.train();
-            Logger.getAnonymousLogger().info("trained that shit");
+            svm_model model = trainingWrapper.train();
+            if(model != null) {
+                Logger.getAnonymousLogger().info("trained that shit");
+                predictionWrapper.setModel(model);
+                modelLabel.setText(model.toString());
+            }
         } catch (IOException e1) {
             Logger.getAnonymousLogger().info("Error while training.. " + e1.getMessage());
         }
@@ -348,6 +366,29 @@ public class SUI extends Application implements Initializable {
         if (file != null) {
             trainingWrapper.setInputFile(file.getAbsolutePath());
             selectedInputFileLabel.setText(trainingWrapper.getInputFile());
+        }
+    }
+
+    @FXML
+    public void handleTestDataBtnClick(final ActionEvent e) {
+        final FileChooser fileChooser = new FileChooser();
+        File file = fileChooser.showOpenDialog(currentStage);
+        if (file != null) {
+            predictionWrapper.setTestDataFilePath(file.getAbsolutePath());
+            testDataLabel.setText(predictionWrapper.getTestDataFilePath());
+
+            predictionOutputFilePath = file.getAbsolutePath().substring(0, file.getAbsolutePath().lastIndexOf(".")) + ".prediction";
+            predictionWrapper.setOutputFilePath(predictionOutputFilePath);
+        }
+    }
+
+    @FXML
+    public void predict(){
+        try {
+            predictionWrapper.predict();
+            Logger.getAnonymousLogger().info("Predicted that shit, prediction saved in " + predictionOutputFilePath);
+        } catch (IOException e) {
+            Logger.getAnonymousLogger().info("Error while predicting.." + e.getMessage());
         }
     }
 
