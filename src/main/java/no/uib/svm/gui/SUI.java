@@ -383,6 +383,22 @@ public class SUI extends Application implements Initializable {
     }
 
     @FXML
+    public void handleModelBtnClick(final ActionEvent e) {
+        final FileChooser fileChooser = new FileChooser();
+        File file = fileChooser.showOpenDialog(currentStage);
+        if (file != null) {
+            try {
+                predictionWrapper.loadModel(file.getAbsolutePath());
+                modelLabel.setText(predictionWrapper.getModel().toString());
+            } catch (IOException e1) {
+                Logger.getAnonymousLogger().info("Error while loading file.. " + e1.getMessage());
+            }
+            testDataLabel.setText(predictionWrapper.getTestDataFilePath());
+
+        }
+    }
+
+    @FXML
     public void predict(){
         try {
             predictionWrapper.predict();

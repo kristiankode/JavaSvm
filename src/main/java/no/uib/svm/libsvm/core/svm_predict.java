@@ -28,7 +28,7 @@ public class svm_predict {
 
 	private static double atof(String s)
 	{
-		return Double.valueOf(s).doubleValue();
+		return Double.valueOf(s);
 	}
 
 	private static int atoi(String s)
