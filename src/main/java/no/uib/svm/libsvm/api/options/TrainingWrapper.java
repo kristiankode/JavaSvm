@@ -69,7 +69,11 @@ public class TrainingWrapper {
         trainingEngine.setParam(fillSvmParam());
     }
 
-    public void loadFile() throws IOException {
+    /**
+     * Loads training data from file. Data must be in SvmLight-format.
+     * @throws IOException
+     */
+    public void loadTrainingDataFromFile() throws IOException {
         updateTrainingParams();
         trainingEngine.setInput_file_name(inputFile);
         trainingEngine.read_problem();
@@ -82,7 +86,7 @@ public class TrainingWrapper {
      * @throws IOException
      */
     public svm_model train() throws IOException {
-        loadFile();
+        loadTrainingDataFromFile();
         if (isParametersValid()) {
             svm_model model =
                     svm.svm_train(trainingEngine.getProb(), trainingEngine.getParam());

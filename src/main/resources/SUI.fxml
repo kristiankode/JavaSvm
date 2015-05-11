@@ -7,7 +7,7 @@
 
 <TabPane xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="no.uib.svm.gui.SUI">
    <tabs>
-      <Tab text="Training">
+      <Tab text="Train">
          <content>
             <GridPane prefHeight="632.0" prefWidth="573.0">
               <columnConstraints>
@@ -98,7 +98,7 @@
             </GridPane>
          </content>
       </Tab>
-      <Tab text="Prediction">
+      <Tab text="Test">
          <content>
             <GridPane>
               <columnConstraints>
@@ -106,8 +106,8 @@
                 <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
               </columnConstraints>
               <rowConstraints>
-                  <RowConstraints maxHeight="151.0" minHeight="0.0" prefHeight="132.0" vgrow="SOMETIMES" />
-                <RowConstraints maxHeight="402.0" minHeight="0.0" prefHeight="69.0" vgrow="SOMETIMES" />
+                  <RowConstraints maxHeight="151.0" minHeight="0.0" prefHeight="120.0" vgrow="SOMETIMES" />
+                <RowConstraints maxHeight="402.0" minHeight="0.0" prefHeight="81.0" vgrow="SOMETIMES" />
                 <RowConstraints maxHeight="482.0" minHeight="10.0" prefHeight="91.0" vgrow="SOMETIMES" />
                   <RowConstraints maxHeight="482.0" minHeight="10.0" prefHeight="61.0" vgrow="SOMETIMES" />
                 <RowConstraints maxHeight="505.0" minHeight="10.0" prefHeight="331.0" vgrow="SOMETIMES" />
@@ -118,7 +118,7 @@
                   <Label fx:id="testDataLabel" text="..." GridPane.columnIndex="1" GridPane.rowIndex="2" GridPane.valignment="CENTER" />
                   <Button fx:id="selectTestDataBtn" mnemonicParsing="false" onAction="#handleTestDataBtnClick" text="Select test data" GridPane.rowIndex="2" />
                   <Separator prefWidth="200.0" GridPane.columnSpan="2" GridPane.rowIndex="1" />
-                  <Button fx:id="predictBtn" mnemonicParsing="false" onAction="#predict" text="Predict that shit" GridPane.columnSpan="2" GridPane.rowIndex="4" />
+                  <Button fx:id="predictBtn" mnemonicParsing="false" onAction="#predict" text="Test that shit" GridPane.columnSpan="2" GridPane.rowIndex="4" />
                   <Separator prefWidth="200.0" GridPane.columnSpan="2" GridPane.rowIndex="3" />
                   <Button fx:id="selectModelBtn" mnemonicParsing="false" onAction="#handleModelBtnClick" text="Select model from file" GridPane.valignment="BOTTOM" />
                </children>
@@ -127,6 +127,34 @@
                </padding>
             </GridPane>
          </content>
+      </Tab>
+      <Tab text="Predict">
+        <content>
+            <GridPane>
+               <children>
+                  <Label text="Using model:" GridPane.valignment="CENTER" />
+                  <Label fx:id="modelLabel1" text="..." GridPane.columnIndex="1" GridPane.halignment="CENTER" />
+                  <Separator prefWidth="200.0" GridPane.columnSpan="2" GridPane.rowIndex="1" />
+                  <Button fx:id="predictBtn1" mnemonicParsing="false" onAction="#predict" text="Test that shit" GridPane.columnSpan="2" GridPane.rowIndex="4" />
+                  <Separator prefWidth="200.0" GridPane.columnSpan="2" GridPane.rowIndex="3" />
+                  <Button fx:id="selectModelBtn1" mnemonicParsing="false" onAction="#handleModelBtnClick" text="Select model from file" GridPane.valignment="BOTTOM" />
+               </children>
+               <columnConstraints>
+                  <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                  <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+               </columnConstraints>
+               <padding>
+                  <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+               </padding>
+               <rowConstraints>
+                  <RowConstraints maxHeight="151.0" minHeight="0.0" prefHeight="120.0" vgrow="SOMETIMES" />
+                  <RowConstraints maxHeight="402.0" minHeight="0.0" prefHeight="81.0" vgrow="SOMETIMES" />
+                  <RowConstraints maxHeight="482.0" minHeight="10.0" prefHeight="91.0" vgrow="SOMETIMES" />
+                  <RowConstraints maxHeight="482.0" minHeight="10.0" prefHeight="61.0" vgrow="SOMETIMES" />
+                  <RowConstraints maxHeight="505.0" minHeight="10.0" prefHeight="331.0" vgrow="SOMETIMES" />
+               </rowConstraints>
+            </GridPane>
+        </content>
       </Tab>
    </tabs>
 </TabPane>
