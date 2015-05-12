@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.logging.Logger;
 
 /**
- * Created by kristianhestetun on 05.05.15.
  * Class that trains an SVM.
  * The result is a model which can be used for prediction.
  */

@@ -8,7 +8,7 @@ import java.io.*;
 import java.util.logging.Logger;
 
 /**
- * Created by kristianhestetun on 06.05.15.
+ * Class for testing the performance of a model.
  */
 public class TestingWrapper {
 
