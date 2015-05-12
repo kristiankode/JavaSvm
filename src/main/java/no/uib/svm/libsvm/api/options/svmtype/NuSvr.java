@@ -28,13 +28,13 @@ public class NuSvr extends SvmType {
      * for C_SVC, EPSILON_SVR and NU_SVR
      * default: 1
      */
-    private double C;    // for C_SVC, EPSILON_SVR and NU_SVR
+    private double C;
 
     /**
      * The parameter nu of nu-SVC, one-class SVM, and nu-SVR
      * default: 0.5
      */
-    public double nu;    // for NU_SVC, ONE_CLASS, and NU_SVR
+    public double nu;
 
     public final static NuSvr defaultNuSvr = new NuSvr(
             DEFAULT_C, DEFAULT_NU);
