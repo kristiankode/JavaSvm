@@ -14,10 +14,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -30,6 +27,9 @@ import no.uib.svm.libsvm.core.libsvm.svm_model;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
@@ -80,6 +80,12 @@ public class SUI extends Application implements Initializable {
 
     @FXML
     private Button predictBtn;
+
+    // display model
+    @FXML
+    private TableView classTable;
+    @FXML
+    private Label numberOfClassesLabel;
 
     private TrainingWrapper trainingWrapper;
     private PredictionWrapper predictionWrapper;
@@ -390,12 +396,32 @@ public class SUI extends Application implements Initializable {
             try {
                 predictionWrapper.loadModel(file.getAbsolutePath());
                 modelLabel.setText(predictionWrapper.getModel().toString());
+                updateModelInfo(predictionWrapper.getModel());
             } catch (IOException e1) {
                 Logger.getAnonymousLogger().info("Error while loading file.. " + e1.getMessage());
             }
             testDataLabel.setText(predictionWrapper.getTestDataFilePath());
-
         }
+    }
+
+    private void updateModelInfo(svm_model model){
+        numberOfClassesLabel.setText(String.valueOf(model.nr_class));
+
+        updateClassTableWithModel();
+    }
+
+    private void updateClassTableWithModel(){
+        List<Integer> labelList = intArrayToList(predictionWrapper.getModel().label);
+        ObservableList<Integer> labels = FXCollections.observableArrayList(labelList);
+        classTable.setItems(labels);
+    }
+
+    public List<Integer> intArrayToList(int[] intArr){
+        List<Integer> integerList = new ArrayList<Integer>();
+        for(int i : intArr){
+            integerList.add(i);
+        }
+        return integerList;
     }
 
     @FXML

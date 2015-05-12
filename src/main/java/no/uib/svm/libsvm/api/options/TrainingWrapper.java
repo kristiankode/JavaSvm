@@ -37,6 +37,9 @@ public class TrainingWrapper {
     private String inputFile = "";
     private String trainingOutputFile = "result.model";
 
+    // Outputs
+    private String trainingResultInfo;
+
     private List<Kernel> availableKernels = Arrays.asList(
             PolynomialKernel.defaultPolynomialKernel,
             RadialBasisKernel.defaultRadialBasisKernel,
