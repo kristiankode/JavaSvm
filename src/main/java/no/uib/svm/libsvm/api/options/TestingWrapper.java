@@ -10,7 +10,7 @@ import java.util.logging.Logger;
 /**
  * Created by kristianhestetun on 06.05.15.
  */
-public class PredictionWrapper {
+public class TestingWrapper {
 
     private String
             modelFilePath,

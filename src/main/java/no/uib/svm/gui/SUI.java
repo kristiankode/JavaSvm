@@ -17,7 +17,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import no.uib.svm.libsvm.api.options.PredictionWrapper;
+import no.uib.svm.libsvm.api.options.TestingWrapper;
 import no.uib.svm.libsvm.api.options.TrainingWrapper;
 import no.uib.svm.libsvm.api.options.kernel.*;
 import no.uib.svm.libsvm.api.options.svmtype.*;
@@ -86,7 +86,7 @@ public class SUI extends Application implements Initializable {
     private Label numberOfClassesLabel;
 
     private TrainingWrapper trainingWrapper;
-    private PredictionWrapper predictionWrapper;
+    private TestingWrapper predictionWrapper;
     private Stage currentStage;
 
     private Kernel selectedKernel;
@@ -106,7 +106,7 @@ public class SUI extends Application implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
 
         trainingWrapper = new TrainingWrapper();
-        predictionWrapper = new PredictionWrapper();
+        predictionWrapper = new TestingWrapper();
 
         initKernelInput();
         initSvmTypeInput();
