@@ -53,6 +53,10 @@ public class TrainingWrapper {
             NuSvr.defaultNuSvr,
             OneClassSvm.defaultOneClass);
 
+    /**
+     * Creates an SvmParameter with values corresponding to class fields.
+     * @return SvmParams with same values as this class.
+     */
     private SvmParameter fillSvmParam() {
         SvmParameter param = new SvmParameter();
 

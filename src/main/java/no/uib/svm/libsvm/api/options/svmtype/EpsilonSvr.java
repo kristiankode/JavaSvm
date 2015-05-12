@@ -3,7 +3,7 @@ package no.uib.svm.libsvm.api.options.svmtype;
 import no.uib.svm.libsvm.core.libsvm.SvmParameter;
 
 /**
- * Created by kristianhestetun on 05.05.15.
+ * Epsilon Support Vector Regression
  */
 public class EpsilonSvr extends SvmType {
 
@@ -23,8 +23,18 @@ public class EpsilonSvr extends SvmType {
         return "Epsilon SVR";
     }
 
-    private double C;    // for C_SVC, EPSILON_SVR and NU_SVR
-    public double p;    // for EPSILON_SVR
+    /**
+     * Cost
+     * for C_SVC, EPSILON_SVR and NU_SVR
+     * default: 1
+     */
+    private double C;
+
+    /**
+     * The epsilon in loss function of epsilon-SVR
+     * default: 0.1
+     */
+    public double p;
 
     private final static double DEFAULT_C = 1;
     private final static double DEFAULT_P = 0.1;
