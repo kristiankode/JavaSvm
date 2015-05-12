@@ -43,9 +43,9 @@ public class TrainingWrapper {
     private List<Kernel> availableKernels = Arrays.asList(
             PolynomialKernel.defaultPolynomialKernel,
             RadialBasisKernel.defaultRadialBasisKernel,
-            new LinearKernel(),
             new PrecomputedKernel(),
-            new SigmoidKernel());
+            new SigmoidKernel(),
+            new LinearKernel());
 
     private List<SvmType> availableSvmTypes = Arrays.asList(
             CSvc.defaultCsvc,

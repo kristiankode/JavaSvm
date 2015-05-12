@@ -15,7 +15,6 @@ public class Model implements java.io.Serializable
 	public int[] sv_indices;       // sv_indices[0,...,nSV-1] are values in [1,...,num_traning_data] to indicate SVs in the training set
 
 	// for classification only
-
 	public int[] label;		// label of each class (label[k])
 	public int[] nSV;		// number of SVs for each class (nSV[k])
 				// nSV[0] + nSV[1] + ... + nSV[k-1] = l
