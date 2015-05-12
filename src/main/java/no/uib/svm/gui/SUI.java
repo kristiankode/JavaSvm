@@ -154,14 +154,14 @@ public class SUI extends Application implements Initializable {
                         svmTypeLabel.setText(selectedSvmType.toString() + " parameters");
                         resetSvmParams();
 
-                        if (selectedSvmType instanceof C_SVC) {
-                            handleCsvcSelected((C_SVC) selectedSvmType);
-                        } else if (selectedSvmType instanceof NU_SVC) {
-                            handleNuSvcSelected((NU_SVC) selectedSvmType);
-                        } else if (selectedSvmType instanceof NU_SVR) {
-                            handleNuSvrSelected((NU_SVR) selectedSvmType);
-                        } else if (selectedSvmType instanceof EPSILON_SVR) {
-                            handleEpsilonSvrSelected((EPSILON_SVR) selectedSvmType);
+                        if (selectedSvmType instanceof CSvc) {
+                            handleCsvcSelected((CSvc) selectedSvmType);
+                        } else if (selectedSvmType instanceof NuSvc) {
+                            handleNuSvcSelected((NuSvc) selectedSvmType);
+                        } else if (selectedSvmType instanceof NuSvr) {
+                            handleNuSvrSelected((NuSvr) selectedSvmType);
+                        } else if (selectedSvmType instanceof EpsilonSvr) {
+                            handleEpsilonSvrSelected((EpsilonSvr) selectedSvmType);
                         } else if (selectedSvmType instanceof OneClassSvm) {
                             handleOneClassSvmSelected((OneClassSvm) selectedSvmType);
                         }
@@ -193,14 +193,14 @@ public class SUI extends Application implements Initializable {
     }
 
     public void updateSVMTypeParams() {
-        if (selectedSvmType instanceof C_SVC) {
-            updateCSVCType((C_SVC) selectedSvmType);
-        } else if (selectedSvmType instanceof EPSILON_SVR) {
-            updateEpsilonSVRType((EPSILON_SVR) selectedSvmType);
-        } else if (selectedSvmType instanceof NU_SVC) {
-            updateNUSVCType((NU_SVC) selectedSvmType);
-        } else if (selectedSvmType instanceof NU_SVR) {
-            updateNUSVRType((NU_SVR) selectedSvmType);
+        if (selectedSvmType instanceof CSvc) {
+            updateCSVCType((CSvc) selectedSvmType);
+        } else if (selectedSvmType instanceof EpsilonSvr) {
+            updateEpsilonSVRType((EpsilonSvr) selectedSvmType);
+        } else if (selectedSvmType instanceof NuSvc) {
+            updateNUSVCType((NuSvc) selectedSvmType);
+        } else if (selectedSvmType instanceof NuSvr) {
+            updateNUSVRType((NuSvr) selectedSvmType);
         } else if (selectedSvmType instanceof OneClassSvm) {
             updateOneClassSVM((OneClassSvm) selectedSvmType);
         }
@@ -210,21 +210,21 @@ public class SUI extends Application implements Initializable {
         svm.setNu(Double.parseDouble(paramNu.getText())); //TODO: check if correct
     }
 
-    private void updateNUSVRType(NU_SVR svm) {
+    private void updateNUSVRType(NuSvr svm) {
         svm.setNu(Double.parseDouble(paramNu.getText())); //TODO: check if correct
         svm.setC(Double.parseDouble(paramC.getText())); //TODO: check if correct
     }
 
-    private void updateNUSVCType(NU_SVC svm) {
+    private void updateNUSVCType(NuSvc svm) {
         svm.setNu(Double.parseDouble(paramNu.getText())); //TODO: check if correct
     }
 
-    private void updateEpsilonSVRType(EPSILON_SVR svm) {
+    private void updateEpsilonSVRType(EpsilonSvr svm) {
         svm.setC(Double.parseDouble(paramC.getText())); //TODO: Check if correct
         svm.setP(Double.parseDouble(paramP.getText())); //TODO: Check if correct
     }
 
-    private void updateCSVCType(C_SVC svm) {
+    private void updateCSVCType(CSvc svm) {
         svm.setC(Double.parseDouble(paramC.getText())); //TODO: Check if correct
         svm.setNr_weight(Integer.parseInt(paramNrWeight.getText()));
         svm.setWeight(convertToDoubleArray(paramWeight.getText()));
@@ -291,14 +291,14 @@ public class SUI extends Application implements Initializable {
         updateInput(coef0Input, kernel.getCoef0());
     }
 
-    private void handleCsvcSelected(C_SVC svm) {
+    private void handleCsvcSelected(CSvc svm) {
         updateInput(paramC, svm.getC());
         updateInput(paramNrWeight, svm.getNr_weight());
         updateInput(paramWeight, svm.getWeight());
         updateInput(paramWeightLabel, svm.getWeight_label());
     }
 
-    private void handleNuSvcSelected(NU_SVC svm) {
+    private void handleNuSvcSelected(NuSvc svm) {
         updateInput(paramNu, svm.getNu());
     }
 
@@ -306,12 +306,12 @@ public class SUI extends Application implements Initializable {
         updateInput(paramNu, svm.getNu());
     }
 
-    private void handleNuSvrSelected(NU_SVR svm) {
+    private void handleNuSvrSelected(NuSvr svm) {
         updateInput(paramNu, svm.getNu());
         updateInput(paramC, svm.getC());
     }
 
-    private void handleEpsilonSvrSelected(EPSILON_SVR svm) {
+    private void handleEpsilonSvrSelected(EpsilonSvr svm) {
         updateInput(paramP, svm.getP());
         updateInput(paramC, svm.getC());
     }

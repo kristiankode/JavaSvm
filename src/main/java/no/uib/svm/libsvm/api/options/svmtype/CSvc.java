@@ -5,7 +5,7 @@ import no.uib.svm.libsvm.core.libsvm.SvmParameter;
 /**
  * Created by kristianhestetun on 05.05.15.
  */
-public class C_SVC extends SvmType {
+public class CSvc extends SvmType {
 
     @Override
     public int getId() {
@@ -30,10 +30,10 @@ public class C_SVC extends SvmType {
     private int[] weight_label;    // for C_SVC
     private double[] weight;        // for C_SVC
 
-    public final static C_SVC defaultCsvc = new C_SVC(
+    public final static CSvc defaultCsvc = new CSvc(
             DEFAULT_C,DEFAULT_NR_WEIGHT, DEFAULT_WEIGHT_LABEL, DEFAULT_WEIGHT);
 
-    public C_SVC(double c, int nr_weight, int[] weight_label, double[] weight) {
+    public CSvc(double c, int nr_weight, int[] weight_label, double[] weight) {
         C = c;
         this.nr_weight = nr_weight;
         this.weight_label = weight_label;

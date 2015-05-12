@@ -5,36 +5,32 @@ import no.uib.svm.libsvm.core.libsvm.SvmParameter;
 /**
  * Created by kristianhestetun on 05.05.15.
  */
-public class EPSILON_SVR extends SvmType {
+public class NuSvr extends SvmType {
 
     @Override
     public int getId() {
-        return EPSILON_SVR;
+        return SvmType.NU_SVR;
     }
 
     @Override
     public void fillSvmParameter(SvmParameter param) {
         param.C = this.C;
-        param.p = this.p;
+        param.nu = this.nu;
     }
 
     @Override
     public String getName() {
-        return "Epsilon SVR";
+        return "Nu SVR";
     }
-
     private double C;    // for C_SVC, EPSILON_SVR and NU_SVR
-    public double p;    // for EPSILON_SVR
+    public double nu;    // for NU_SVC, ONE_CLASS, and NU_SVR
 
-    private final static double DEFAULT_C = 1;
-    private final static double DEFAULT_P = 0.1;
+    public final static NuSvr defaultNuSvr = new NuSvr(
+            DEFAULT_C, DEFAULT_NU);
 
-    public final static EPSILON_SVR defaultEpsilonSvr = new EPSILON_SVR(
-            DEFAULT_C, DEFAULT_P);
-
-    public EPSILON_SVR(double c, double p) {
+    public NuSvr(double c, double nu) {
         C = c;
-        this.p = p;
+        this.nu = nu;
     }
 
     public double getC() {
@@ -45,11 +41,11 @@ public class EPSILON_SVR extends SvmType {
         C = c;
     }
 
-    public double getP() {
-        return p;
+    public double getNu() {
+        return nu;
     }
 
-    public void setP(double p) {
-        this.p = p;
+    public void setNu(double nu) {
+        this.nu = nu;
     }
 }

@@ -5,7 +5,7 @@ import no.uib.svm.libsvm.core.libsvm.SvmParameter;
 /**
  * Created by kristianhestetun on 05.05.15.
  */
-public class NU_SVC extends SvmType {
+public class NuSvc extends SvmType {
 
     @Override
     public int getId() {
@@ -24,10 +24,10 @@ public class NU_SVC extends SvmType {
 
     private double nu;    // for NU_SVC, ONE_CLASS, and NU_SVR
 
-    public final static NU_SVC defaultNuSvc = new NU_SVC(
+    public final static NuSvc defaultNuSvc = new NuSvc(
             DEFAULT_NU);
 
-    public NU_SVC(double nu) {
+    public NuSvc(double nu) {
         this.nu = nu;
     }
 

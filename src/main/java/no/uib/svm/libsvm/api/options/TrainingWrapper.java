@@ -23,7 +23,7 @@ public class TrainingWrapper {
 
     // Usage: svm_train [options] training_set_file [model_file]\n
     private Kernel selectedKernel = new LinearKernel();
-    private SvmType selectedSvmType = C_SVC.defaultCsvc;
+    private SvmType selectedSvmType = CSvc.defaultCsvc;
 
     private SvmTrainer trainingEngine = new SvmTrainer();
 
@@ -48,10 +48,10 @@ public class TrainingWrapper {
             new SigmoidKernel());
 
     private List<SvmType> availableSvmTypes = Arrays.asList(
-            C_SVC.defaultCsvc,
-            EPSILON_SVR.defaultEpsilonSvr,
-            NU_SVC.defaultNuSvc,
-            NU_SVR.defaultNuSvr,
+            CSvc.defaultCsvc,
+            EpsilonSvr.defaultEpsilonSvr,
+            NuSvc.defaultNuSvc,
+            NuSvr.defaultNuSvr,
             OneClassSvm.defaultOneClass);
 
     private SvmParameter fillSvmParam() {
