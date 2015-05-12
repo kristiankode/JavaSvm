@@ -15,20 +15,18 @@ import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.layout.GridPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import no.uib.svm.libsvm.api.options.PredictionWrapper;
 import no.uib.svm.libsvm.api.options.TrainingWrapper;
 import no.uib.svm.libsvm.api.options.kernel.*;
 import no.uib.svm.libsvm.api.options.svmtype.*;
-import no.uib.svm.libsvm.core.libsvm.svm_model;
+import no.uib.svm.libsvm.core.libsvm.Model;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
@@ -354,7 +352,7 @@ public class SUI extends Application implements Initializable {
     public void startTraining(final ActionEvent e) {
         updateTrainingEngine();
         try {
-            svm_model model = trainingWrapper.train();
+            Model model = trainingWrapper.train();
             if(model != null) {
                 Logger.getAnonymousLogger().info("trained that shit");
                 predictionWrapper.setModel(model);
@@ -404,7 +402,7 @@ public class SUI extends Application implements Initializable {
         }
     }
 
-    private void updateModelInfo(svm_model model){
+    private void updateModelInfo(Model model){
         numberOfClassesLabel.setText(String.valueOf(model.nr_class));
 
         updateClassTableWithModel();

@@ -3,9 +3,9 @@ package no.uib.svm.libsvm.api.options;
 import no.uib.svm.libsvm.api.options.kernel.*;
 import no.uib.svm.libsvm.api.options.svmtype.*;
 import no.uib.svm.libsvm.core.libsvm.svm;
-import no.uib.svm.libsvm.core.libsvm.svm_model;
-import no.uib.svm.libsvm.core.libsvm.svm_parameter;
-import no.uib.svm.libsvm.core.svm_train;
+import no.uib.svm.libsvm.core.libsvm.Model;
+import no.uib.svm.libsvm.core.libsvm.SvmParameter;
+import no.uib.svm.libsvm.core.SvmTrainer;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -25,7 +25,7 @@ public class TrainingWrapper {
     private Kernel selectedKernel = new LinearKernel();
     private SvmType selectedSvmType = C_SVC.defaultCsvc;
 
-    private svm_train trainingEngine = new svm_train();
+    private SvmTrainer trainingEngine = new SvmTrainer();
 
     // these are for training only
     public double cache_size = 100; // in MB
@@ -54,8 +54,8 @@ public class TrainingWrapper {
             NU_SVR.defaultNuSvr,
             OneClassSvm.defaultOneClass);
 
-    private svm_parameter fillSvmParam() {
-        svm_parameter param = new svm_parameter();
+    private SvmParameter fillSvmParam() {
+        SvmParameter param = new SvmParameter();
 
         param.cache_size = this.cache_size;
         param.eps = this.eps;
@@ -88,10 +88,10 @@ public class TrainingWrapper {
      * @return
      * @throws IOException
      */
-    public svm_model train() throws IOException {
+    public Model train() throws IOException {
         loadTrainingDataFromFile();
         if (isParametersValid()) {
-            svm_model model =
+            Model model =
                     svm.svm_train(trainingEngine.getProb(), trainingEngine.getParam());
 
             svm.svm_save_model(inputFile + ".model", model);

@@ -1,6 +1,6 @@
 package no.uib.svm.libsvm.api.options.kernel;
 
-import no.uib.svm.libsvm.core.libsvm.svm_parameter;
+import no.uib.svm.libsvm.core.libsvm.SvmParameter;
 
 /**
  * Created by kristianhestetun on 05.05.15.
@@ -27,7 +27,7 @@ public abstract class Kernel {
         return this.getName();
     }
 
-    public abstract void fillSvmParameter(svm_parameter param);
+    public abstract void fillSvmParameter(SvmParameter param);
 
 
 }

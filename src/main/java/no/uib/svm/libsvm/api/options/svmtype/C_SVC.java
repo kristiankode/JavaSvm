@@ -1,6 +1,6 @@
 package no.uib.svm.libsvm.api.options.svmtype;
 
-import no.uib.svm.libsvm.core.libsvm.svm_parameter;
+import no.uib.svm.libsvm.core.libsvm.SvmParameter;
 
 /**
  * Created by kristianhestetun on 05.05.15.
@@ -18,7 +18,7 @@ public class C_SVC extends SvmType {
     }
 
     @Override
-    public void fillSvmParameter(svm_parameter param) {
+    public void fillSvmParameter(SvmParameter param) {
         param.C = this.C;
         param.nr_weight = this.nr_weight;
         param.weight_label = this.weight_label;

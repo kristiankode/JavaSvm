@@ -1,5 +1,5 @@
 package no.uib.svm.libsvm.core.libsvm;
-public class svm_parameter implements Cloneable,java.io.Serializable
+public class SvmParameter implements Cloneable,java.io.Serializable
 {
 	/* svm_type */
 	public static final int C_SVC = 0;

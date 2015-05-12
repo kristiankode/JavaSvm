@@ -1,6 +1,6 @@
 package no.uib.svm.libsvm.api.options.svmtype;
 
-import no.uib.svm.libsvm.core.libsvm.svm_parameter;
+import no.uib.svm.libsvm.core.libsvm.SvmParameter;
 
 /**
  * Created by kristianhestetun on 05.05.15.
@@ -13,7 +13,7 @@ public class OneClassSvm extends SvmType {
     }
 
     @Override
-    public void fillSvmParameter(svm_parameter param) {
+    public void fillSvmParameter(SvmParameter param) {
         param.nu = this.nu;
     }
 

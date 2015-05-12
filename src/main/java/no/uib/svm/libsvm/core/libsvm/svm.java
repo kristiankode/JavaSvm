@@ -1,7 +1,6 @@
 package no.uib.svm.libsvm.core.libsvm;
 import java.io.*;
 import java.util.*;
-import java.util.logging.Logger;
 
 //
 // Kernel Cache
@@ -130,7 +129,7 @@ abstract class QMatrix {
 };
 
 abstract class Kernel extends QMatrix {
-	private svm_node[][] x;
+	private Node[][] x;
 	private final double[] x_square;
 
 	// svm_parameter
@@ -144,7 +143,7 @@ abstract class Kernel extends QMatrix {
 
 	void swap_index(int i, int j)
 	{
-		do {svm_node[] _=x[i]; x[i]=x[j]; x[j]=_;} while(false);
+		do {Node[] _=x[i]; x[i]=x[j]; x[j]=_;} while(false);
 		if(x_square != null) do {double _=x_square[i]; x_square[i]=x_square[j]; x_square[j]=_;} while(false);
 	}
 
@@ -164,31 +163,31 @@ abstract class Kernel extends QMatrix {
 	{
 		switch(kernel_type)
 		{
-			case svm_parameter.LINEAR:
+			case SvmParameter.LINEAR:
 				return dot(x[i],x[j]);
-			case svm_parameter.POLY:
+			case SvmParameter.POLY:
 				return powi(gamma*dot(x[i],x[j])+coef0,degree);
-			case svm_parameter.RBF:
+			case SvmParameter.RBF:
 				return Math.exp(-gamma*(x_square[i]+x_square[j]-2*dot(x[i],x[j])));
-			case svm_parameter.SIGMOID:
+			case SvmParameter.SIGMOID:
 				return Math.tanh(gamma*dot(x[i],x[j])+coef0);
-			case svm_parameter.PRECOMPUTED:
+			case SvmParameter.PRECOMPUTED:
 				return x[i][(int)(x[j][0].value)].value;
 			default:
 				return 0;	// java
 		}
 	}
 
-	Kernel(int l, svm_node[][] x_, svm_parameter param)
+	Kernel(int l, Node[][] x_, SvmParameter param)
 	{
 		this.kernel_type = param.kernel_type;
 		this.degree = param.degree;
 		this.gamma = param.gamma;
 		this.coef0 = param.coef0;
 
-		x = (svm_node[][])x_.clone();
+		x = (Node[][])x_.clone();
 
-		if(kernel_type == svm_parameter.RBF)
+		if(kernel_type == SvmParameter.RBF)
 		{
 			x_square = new double[l];
 			for(int i=0;i<l;i++)
@@ -197,7 +196,7 @@ abstract class Kernel extends QMatrix {
 		else x_square = null;
 	}
 
-	static double dot(svm_node[] x, svm_node[] y)
+	static double dot(Node[] x, Node[] y)
 	{
 		double sum = 0;
 		int xlen = x.length;
@@ -219,16 +218,16 @@ abstract class Kernel extends QMatrix {
 		return sum;
 	}
 
-	static double k_function(svm_node[] x, svm_node[] y,
-					svm_parameter param)
+	static double k_function(Node[] x, Node[] y,
+					SvmParameter param)
 	{
 		switch(param.kernel_type)
 		{
-			case svm_parameter.LINEAR:
+			case SvmParameter.LINEAR:
 				return dot(x,y);
-			case svm_parameter.POLY:
+			case SvmParameter.POLY:
 				return powi(param.gamma*dot(x,y)+param.coef0,param.degree);
-			case svm_parameter.RBF:
+			case SvmParameter.RBF:
 			{
 				double sum = 0;
 				int xlen = x.length;
@@ -268,9 +267,9 @@ abstract class Kernel extends QMatrix {
 
 				return Math.exp(-param.gamma*sum);
 			}
-			case svm_parameter.SIGMOID:
+			case SvmParameter.SIGMOID:
 				return Math.tanh(param.gamma*dot(x,y)+param.coef0);
-			case svm_parameter.PRECOMPUTED:
+			case SvmParameter.PRECOMPUTED:
 				return	x[(int)(y[0].value)].value;
 			default:
 				return 0;	// java
@@ -1147,7 +1146,7 @@ class SVC_Q extends Kernel
 	private final Cache cache;
 	private final double[] QD;
 
-	SVC_Q(svm_problem prob, svm_parameter param, byte[] y_)
+	SVC_Q(Problem prob, SvmParameter param, byte[] y_)
 	{
 		super(prob.l, prob.x, param);
 		y = (byte[])y_.clone();
@@ -1188,7 +1187,7 @@ class ONE_CLASS_Q extends Kernel
 	private final Cache cache;
 	private final double[] QD;
 
-	ONE_CLASS_Q(svm_problem prob, svm_parameter param)
+	ONE_CLASS_Q(Problem prob, SvmParameter param)
 	{
 		super(prob.l, prob.x, param);
 		cache = new Cache(prob.l,(long)(param.cache_size*(1<<20)));
@@ -1232,7 +1231,7 @@ class SVR_Q extends Kernel
 	private float[][] buffer;
 	private final double[] QD;
 
-	SVR_Q(svm_problem prob, svm_parameter param)
+	SVR_Q(Problem prob, SvmParameter param)
 	{
 		super(prob.l, prob.x, param);
 		l = prob.l;
@@ -1292,7 +1291,7 @@ public class svm {
 	public static final int LIBSVM_VERSION=320; 
 	public static final Random rand = new Random();
 
-	private static svm_print_interface svm_print_stdout = new svm_print_interface()
+	private static PrintInterface svm_print_stdout = new PrintInterface()
 	{
 		public void print(String s)
 		{
@@ -1301,14 +1300,14 @@ public class svm {
 		}
 	};
 
-	private static svm_print_interface svm_print_string = svm_print_stdout;
+	private static PrintInterface svm_print_string = svm_print_stdout;
 
 	static void info(String s) 
 	{
 		svm_print_string.print(s);
 	}
 
-	private static void solve_c_svc(svm_problem prob, svm_parameter param,
+	private static void solve_c_svc(Problem prob, SvmParameter param,
 					double[] alpha, Solver.SolutionInfo si,
 					double Cp, double Cn)
 	{
@@ -1340,7 +1339,7 @@ public class svm {
 			alpha[i] *= y[i];
 	}
 
-	private static void solve_nu_svc(svm_problem prob, svm_parameter param,
+	private static void solve_nu_svc(Problem prob, SvmParameter param,
 					double[] alpha, Solver.SolutionInfo si)
 	{
 		int i;
@@ -1391,7 +1390,7 @@ public class svm {
 		si.upper_bound_n = 1/r;
 	}
 
-	private static void solve_one_class(svm_problem prob, svm_parameter param,
+	private static void solve_one_class(Problem prob, SvmParameter param,
 					double[] alpha, Solver.SolutionInfo si)
 	{
 		int l = prob.l;
@@ -1419,7 +1418,7 @@ public class svm {
 			alpha, 1.0, 1.0, param.eps, si, param.shrinking);
 	}
 
-	private static void solve_epsilon_svr(svm_problem prob, svm_parameter param,
+	private static void solve_epsilon_svr(Problem prob, SvmParameter param,
 					double[] alpha, Solver.SolutionInfo si)
 	{
 		int l = prob.l;
@@ -1452,7 +1451,7 @@ public class svm {
 		svm.info("nu = "+sum_alpha/(param.C*l)+"\n");
 	}
 
-	private static void solve_nu_svr(svm_problem prob, svm_parameter param,
+	private static void solve_nu_svr(Problem prob, SvmParameter param,
 					double[] alpha, Solver.SolutionInfo si)
 	{
 		int l = prob.l;
@@ -1495,26 +1494,26 @@ public class svm {
 	};
 
 	static decision_function svm_train_one(
-		svm_problem prob, svm_parameter param,
+		Problem prob, SvmParameter param,
 		double Cp, double Cn)
 	{
 		double[] alpha = new double[prob.l];
 		Solver.SolutionInfo si = new Solver.SolutionInfo();
 		switch(param.svm_type)
 		{
-			case svm_parameter.C_SVC:
+			case SvmParameter.C_SVC:
 				solve_c_svc(prob,param,alpha,si,Cp,Cn);
 				break;
-			case svm_parameter.NU_SVC:
+			case SvmParameter.NU_SVC:
 				solve_nu_svc(prob,param,alpha,si);
 				break;
-			case svm_parameter.ONE_CLASS:
+			case SvmParameter.ONE_CLASS:
 				solve_one_class(prob,param,alpha,si);
 				break;
-			case svm_parameter.EPSILON_SVR:
+			case SvmParameter.EPSILON_SVR:
 				solve_epsilon_svr(prob,param,alpha,si);
 				break;
-			case svm_parameter.NU_SVR:
+			case SvmParameter.NU_SVR:
 				solve_nu_svr(prob,param,alpha,si);
 				break;
 		}
@@ -1735,7 +1734,7 @@ public class svm {
 	}
 
 	// Cross-validation decision values for probability estimates
-	private static void svm_binary_svc_probability(svm_problem prob, svm_parameter param, double Cp, double Cn, double[] probAB)
+	private static void svm_binary_svc_probability(Problem prob, SvmParameter param, double Cp, double Cn, double[] probAB)
 	{
 		int i;
 		int nr_fold = 5;
@@ -1754,10 +1753,10 @@ public class svm {
 			int begin = i*prob.l/nr_fold;
 			int end = (i+1)*prob.l/nr_fold;
 			int j,k;
-			svm_problem subprob = new svm_problem();
+			Problem subprob = new Problem();
 
 			subprob.l = prob.l-(end-begin);
-			subprob.x = new svm_node[subprob.l][];
+			subprob.x = new Node[subprob.l][];
 			subprob.y = new double[subprob.l];
 			
 			k=0;
@@ -1791,7 +1790,7 @@ public class svm {
 					dec_values[perm[j]] = -1;
 			else
 			{
-				svm_parameter subparam = (svm_parameter)param.clone();
+				SvmParameter subparam = (SvmParameter)param.clone();
 				subparam.probability=0;
 				subparam.C=1.0;
 				subparam.nr_weight=2;
@@ -1801,7 +1800,7 @@ public class svm {
 				subparam.weight_label[1]=-1;
 				subparam.weight[0]=Cp;
 				subparam.weight[1]=Cn;
-				svm_model submodel = svm_train(subprob,subparam);
+				Model submodel = svm_train(subprob,subparam);
 				for(j=begin;j<end;j++)
 				{
 					double[] dec_value=new double[1];
@@ -1816,14 +1815,14 @@ public class svm {
 	}
 
 	// Return parameter of a Laplace distribution 
-	private static double svm_svr_probability(svm_problem prob, svm_parameter param)
+	private static double svm_svr_probability(Problem prob, SvmParameter param)
 	{
 		int i;
 		int nr_fold = 5;
 		double[] ymv = new double[prob.l];
 		double mae = 0;
 
-		svm_parameter newparam = (svm_parameter)param.clone();
+		SvmParameter newparam = (SvmParameter)param.clone();
 		newparam.probability = 0;
 		svm_cross_validation(prob,newparam,nr_fold,ymv);
 		for(i=0;i<prob.l;i++)
@@ -1847,7 +1846,7 @@ public class svm {
 
 	// label: label name, start: begin of each class, count: #data of classes, perm: indices to the original data
 	// perm, length l, must be allocated before calling this subroutine
-	private static void svm_group_classes(svm_problem prob, int[] nr_class_ret, int[][] label_ret, int[][] start_ret, int[][] count_ret, int[] perm)
+	private static void svm_group_classes(Problem prob, int[] nr_class_ret, int[][] label_ret, int[][] start_ret, int[][] count_ret, int[] perm)
 	{
 		int l = prob.l;
 		int max_nr_class = 16;
@@ -1928,14 +1927,14 @@ public class svm {
 	//
 	// Interface functions
 	//
-	public static svm_model svm_train(svm_problem prob, svm_parameter param)
+	public static Model svm_train(Problem prob, SvmParameter param)
 	{
-		svm_model model = new svm_model();
+		Model model = new Model();
 		model.param = param;
 
-		if(param.svm_type == svm_parameter.ONE_CLASS ||
-		   param.svm_type == svm_parameter.EPSILON_SVR ||
-		   param.svm_type == svm_parameter.NU_SVR)
+		if(param.svm_type == SvmParameter.ONE_CLASS ||
+		   param.svm_type == SvmParameter.EPSILON_SVR ||
+		   param.svm_type == SvmParameter.NU_SVR)
 		{
 			// regression or one-class-svm
 			model.nr_class = 2;
@@ -1945,8 +1944,8 @@ public class svm {
 			model.sv_coef = new double[1][];
 
 			if(param.probability == 1 &&
-			   (param.svm_type == svm_parameter.EPSILON_SVR ||
-			    param.svm_type == svm_parameter.NU_SVR))
+			   (param.svm_type == SvmParameter.EPSILON_SVR ||
+			    param.svm_type == SvmParameter.NU_SVR))
 			{
 				model.probA = new double[1];
 				model.probA[0] = svm_svr_probability(prob,param);
@@ -1961,7 +1960,7 @@ public class svm {
 			for(i=0;i<prob.l;i++)
 				if(Math.abs(f.alpha[i]) > 0) ++nSV;
 			model.l = nSV;
-			model.SV = new svm_node[nSV][];
+			model.SV = new Node[nSV][];
 			model.sv_coef[0] = new double[nSV];
 			model.sv_indices = new int[nSV];
 			int j = 0;
@@ -1994,7 +1993,7 @@ public class svm {
 			if(nr_class == 1) 
 				svm.info("WARNING: training data in only one class. See README for details.\n");
 			
-			svm_node[][] x = new svm_node[l][];
+			Node[][] x = new Node[l][];
 			int i;
 			for(i=0;i<l;i++)
 				x[i] = prob.x[perm[i]];
@@ -2034,11 +2033,11 @@ public class svm {
 			for(i=0;i<nr_class;i++)
 				for(int j=i+1;j<nr_class;j++)
 				{
-					svm_problem sub_prob = new svm_problem();
+					Problem sub_prob = new Problem();
 					int si = start[i], sj = start[j];
 					int ci = count[i], cj = count[j];
 					sub_prob.l = ci+cj;
-					sub_prob.x = new svm_node[sub_prob.l][];
+					sub_prob.x = new Node[sub_prob.l][];
 					sub_prob.y = new double[sub_prob.l];
 					int k;
 					for(k=0;k<ci;k++)
@@ -2117,7 +2116,7 @@ public class svm {
 			svm.info("Total nSV = "+nnz+"\n");
 
 			model.l = nnz;
-			model.SV = new svm_node[nnz][];
+			model.SV = new Node[nnz][];
 			model.sv_indices = new int[nnz];
 			p = 0;
 			for(i=0;i<l;i++)
@@ -2165,7 +2164,7 @@ public class svm {
 	}
 	
 	// Stratified cross validation
-	public static void svm_cross_validation(svm_problem prob, svm_parameter param, int nr_fold, double[] target)
+	public static void svm_cross_validation(Problem prob, SvmParameter param, int nr_fold, double[] target)
 	{
 		int i;
 		int[] fold_start = new int[nr_fold+1];
@@ -2174,8 +2173,8 @@ public class svm {
 		
 		// stratified cv may not give leave-one-out rate
 		// Each class to l folds -> some folds may have zero elements
-		if((param.svm_type == svm_parameter.C_SVC ||
-		    param.svm_type == svm_parameter.NU_SVC) && nr_fold < l)
+		if((param.svm_type == SvmParameter.C_SVC ||
+		    param.svm_type == SvmParameter.NU_SVC) && nr_fold < l)
 		{
 			int[] tmp_nr_class = new int[1];
 			int[][] tmp_label = new int[1][];
@@ -2241,10 +2240,10 @@ public class svm {
 			int begin = fold_start[i];
 			int end = fold_start[i+1];
 			int j,k;
-			svm_problem subprob = new svm_problem();
+			Problem subprob = new Problem();
 
 			subprob.l = l-(end-begin);
-			subprob.x = new svm_node[subprob.l][];
+			subprob.x = new Node[subprob.l][];
 			subprob.y = new double[subprob.l];
 
 			k=0;
@@ -2260,10 +2259,10 @@ public class svm {
 				subprob.y[k] = prob.y[perm[j]];
 				++k;
 			}
-			svm_model submodel = svm_train(subprob,param);
+			Model submodel = svm_train(subprob,param);
 			if(param.probability==1 &&
-			   (param.svm_type == svm_parameter.C_SVC ||
-			    param.svm_type == svm_parameter.NU_SVC))
+			   (param.svm_type == SvmParameter.C_SVC ||
+			    param.svm_type == SvmParameter.NU_SVC))
 			{
 				double[] prob_estimates= new double[svm_get_nr_class(submodel)];
 				for(j=begin;j<end;j++)
@@ -2275,38 +2274,38 @@ public class svm {
 		}
 	}
 
-	public static int svm_get_svm_type(svm_model model)
+	public static int svm_get_svm_type(Model model)
 	{
 		return model.param.svm_type;
 	}
 
-	public static int svm_get_nr_class(svm_model model)
+	public static int svm_get_nr_class(Model model)
 	{
 		return model.nr_class;
 	}
 
-	public static void svm_get_labels(svm_model model, int[] label)
+	public static void svm_get_labels(Model model, int[] label)
 	{
 		if (model.label != null)
 			for(int i=0;i<model.nr_class;i++)
 				label[i] = model.label[i];
 	}
 
-	public static void svm_get_sv_indices(svm_model model, int[] indices)
+	public static void svm_get_sv_indices(Model model, int[] indices)
 	{
 		if (model.sv_indices != null)
 			for(int i=0;i<model.l;i++)
 				indices[i] = model.sv_indices[i];
 	}
 
-	public static int svm_get_nr_sv(svm_model model)
+	public static int svm_get_nr_sv(Model model)
 	{
 		return model.l;
 	}
 
-	public static double svm_get_svr_probability(svm_model model)
+	public static double svm_get_svr_probability(Model model)
 	{
-		if ((model.param.svm_type == svm_parameter.EPSILON_SVR || model.param.svm_type == svm_parameter.NU_SVR) &&
+		if ((model.param.svm_type == SvmParameter.EPSILON_SVR || model.param.svm_type == SvmParameter.NU_SVR) &&
 		    model.probA!=null)
 		return model.probA[0];
 		else
@@ -2316,12 +2315,12 @@ public class svm {
 		}
 	}
 
-	public static double svm_predict_values(svm_model model, svm_node[] x, double[] dec_values)
+	public static double svm_predict_values(Model model, Node[] x, double[] dec_values)
 	{
 		int i;
-		if(model.param.svm_type == svm_parameter.ONE_CLASS ||
-		   model.param.svm_type == svm_parameter.EPSILON_SVR ||
-		   model.param.svm_type == svm_parameter.NU_SVR)
+		if(model.param.svm_type == SvmParameter.ONE_CLASS ||
+		   model.param.svm_type == SvmParameter.EPSILON_SVR ||
+		   model.param.svm_type == SvmParameter.NU_SVR)
 		{
 			double[] sv_coef = model.sv_coef[0];
 			double sum = 0;
@@ -2330,7 +2329,7 @@ public class svm {
 			sum -= model.rho[0];
 			dec_values[0] = sum;
 
-			if(model.param.svm_type == svm_parameter.ONE_CLASS)
+			if(model.param.svm_type == SvmParameter.ONE_CLASS)
 				return (sum>0)?1:-1;
 			else
 				return sum;
@@ -2389,13 +2388,13 @@ public class svm {
 		}
 	}
 
-	public static double svm_predict(svm_model model, svm_node[] x)
+	public static double svm_predict(Model model, Node[] x)
 	{
 		int nr_class = model.nr_class;
 		double[] dec_values;
-		if(model.param.svm_type == svm_parameter.ONE_CLASS ||
-				model.param.svm_type == svm_parameter.EPSILON_SVR ||
-				model.param.svm_type == svm_parameter.NU_SVR)
+		if(model.param.svm_type == SvmParameter.ONE_CLASS ||
+				model.param.svm_type == SvmParameter.EPSILON_SVR ||
+				model.param.svm_type == SvmParameter.NU_SVR)
 			dec_values = new double[1];
 		else
 			dec_values = new double[nr_class*(nr_class-1)/2];
@@ -2403,9 +2402,9 @@ public class svm {
 		return pred_result;
 	}
 
-	public static double svm_predict_probability(svm_model model, svm_node[] x, double[] prob_estimates)
+	public static double svm_predict_probability(Model model, Node[] x, double[] prob_estimates)
 	{
-		if ((model.param.svm_type == svm_parameter.C_SVC || model.param.svm_type == svm_parameter.NU_SVC) &&
+		if ((model.param.svm_type == SvmParameter.C_SVC || model.param.svm_type == SvmParameter.NU_SVC) &&
 		    model.probA!=null && model.probB!=null)
 		{
 			int i;
@@ -2446,25 +2445,25 @@ public class svm {
 		"linear","polynomial","rbf","sigmoid","precomputed"
 	};
 
-	public static void svm_save_model(String model_file_name, svm_model model) throws IOException
+	public static void svm_save_model(String model_file_name, Model model) throws IOException
 	{
 		DataOutputStream fp = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(model_file_name)));
 
-		svm_parameter param = model.param;
+		SvmParameter param = model.param;
 
 		fp.writeBytes("svm_type "+svm_type_table[param.svm_type]+"\n");
 		fp.writeBytes("kernel_type "+kernel_type_table[param.kernel_type]+"\n");
 
-		if(param.kernel_type == svm_parameter.POLY)
+		if(param.kernel_type == SvmParameter.POLY)
 			fp.writeBytes("degree "+param.degree+"\n");
 
-		if(param.kernel_type == svm_parameter.POLY ||
-		   param.kernel_type == svm_parameter.RBF ||
-		   param.kernel_type == svm_parameter.SIGMOID)
+		if(param.kernel_type == SvmParameter.POLY ||
+		   param.kernel_type == SvmParameter.RBF ||
+		   param.kernel_type == SvmParameter.SIGMOID)
 			fp.writeBytes("gamma "+param.gamma+"\n");
 
-		if(param.kernel_type == svm_parameter.POLY ||
-		   param.kernel_type == svm_parameter.SIGMOID)
+		if(param.kernel_type == SvmParameter.POLY ||
+		   param.kernel_type == SvmParameter.SIGMOID)
 			fp.writeBytes("coef0 "+param.coef0+"\n");
 
 		int nr_class = model.nr_class;
@@ -2512,15 +2511,15 @@ public class svm {
 
 		fp.writeBytes("SV\n");
 		double[][] sv_coef = model.sv_coef;
-		svm_node[][] SV = model.SV;
+		Node[][] SV = model.SV;
 
 		for(int i=0;i<l;i++)
 		{
 			for(int j=0;j<nr_class-1;j++)
 				fp.writeBytes(sv_coef[j][i]+" ");
 
-			svm_node[] p = SV[i];
-			if(param.kernel_type == svm_parameter.PRECOMPUTED)
+			Node[] p = SV[i];
+			if(param.kernel_type == SvmParameter.PRECOMPUTED)
 				fp.writeBytes("0:"+(int)(p[0].value));
 			else	
 				for(int j=0;j<p.length;j++)
@@ -2541,9 +2540,9 @@ public class svm {
 		return Integer.parseInt(s);
 	}
 
-	private static boolean read_model_header(BufferedReader fp, svm_model model)
+	private static boolean read_model_header(BufferedReader fp, Model model)
 	{
-		svm_parameter param = new svm_parameter();
+		SvmParameter param = new SvmParameter();
 		model.param = param;
 		try
 		{
@@ -2654,16 +2653,16 @@ public class svm {
 		return true;
 	}
 
-	public static svm_model svm_load_model(String model_file_name) throws IOException
+	public static Model svm_load_model(String model_file_name) throws IOException
 	{
 		return svm_load_model(new BufferedReader(new FileReader(model_file_name)));
 	}
 
-	public static svm_model svm_load_model(BufferedReader fp) throws IOException
+	public static Model svm_load_model(BufferedReader fp) throws IOException
 	{
 		// read parameters
 
-		svm_model model = new svm_model();
+		Model model = new Model();
 		model.rho = null;
 		model.probA = null;
 		model.probB = null;
@@ -2681,7 +2680,7 @@ public class svm {
 		int m = model.nr_class - 1;
 		int l = model.l;
 		model.sv_coef = new double[m][l];
-		model.SV = new svm_node[l][];
+		model.SV = new Node[l][];
 
 		for(int i=0;i<l;i++)
 		{
@@ -2691,10 +2690,10 @@ public class svm {
 			for(int k=0;k<m;k++)
 				model.sv_coef[k][i] = atof(st.nextToken());
 			int n = st.countTokens()/2;
-			model.SV[i] = new svm_node[n];
+			model.SV[i] = new Node[n];
 			for(int j=0;j<n;j++)
 			{
-				model.SV[i][j] = new svm_node();
+				model.SV[i][j] = new Node();
 				model.SV[i][j].index = atoi(st.nextToken());
 				model.SV[i][j].value = atof(st.nextToken());
 			}
@@ -2704,26 +2703,26 @@ public class svm {
 		return model;
 	}
 
-	public static String svm_check_parameter(svm_problem prob, svm_parameter param)
+	public static String svm_check_parameter(Problem prob, SvmParameter param)
 	{
 		// svm_type
 
 		int svm_type = param.svm_type;
-		if(svm_type != svm_parameter.C_SVC &&
-		   svm_type != svm_parameter.NU_SVC &&
-		   svm_type != svm_parameter.ONE_CLASS &&
-		   svm_type != svm_parameter.EPSILON_SVR &&
-		   svm_type != svm_parameter.NU_SVR)
+		if(svm_type != SvmParameter.C_SVC &&
+		   svm_type != SvmParameter.NU_SVC &&
+		   svm_type != SvmParameter.ONE_CLASS &&
+		   svm_type != SvmParameter.EPSILON_SVR &&
+		   svm_type != SvmParameter.NU_SVR)
 		return "unknown svm type";
 
 		// kernel_type, degree
 	
 		int kernel_type = param.kernel_type;
-		if(kernel_type != svm_parameter.LINEAR &&
-		   kernel_type != svm_parameter.POLY &&
-		   kernel_type != svm_parameter.RBF &&
-		   kernel_type != svm_parameter.SIGMOID &&
-		   kernel_type != svm_parameter.PRECOMPUTED)
+		if(kernel_type != SvmParameter.LINEAR &&
+		   kernel_type != SvmParameter.POLY &&
+		   kernel_type != SvmParameter.RBF &&
+		   kernel_type != SvmParameter.SIGMOID &&
+		   kernel_type != SvmParameter.PRECOMPUTED)
 			return "unknown kernel type";
 
 		if(param.gamma < 0)
@@ -2740,19 +2739,19 @@ public class svm {
 		if(param.eps <= 0)
 			return "eps <= 0";
 
-		if(svm_type == svm_parameter.C_SVC ||
-		   svm_type == svm_parameter.EPSILON_SVR ||
-		   svm_type == svm_parameter.NU_SVR)
+		if(svm_type == SvmParameter.C_SVC ||
+		   svm_type == SvmParameter.EPSILON_SVR ||
+		   svm_type == SvmParameter.NU_SVR)
 			if(param.C <= 0)
 				return "C <= 0";
 
-		if(svm_type == svm_parameter.NU_SVC ||
-		   svm_type == svm_parameter.ONE_CLASS ||
-		   svm_type == svm_parameter.NU_SVR)
+		if(svm_type == SvmParameter.NU_SVC ||
+		   svm_type == SvmParameter.ONE_CLASS ||
+		   svm_type == SvmParameter.NU_SVR)
 			if(param.nu <= 0 || param.nu > 1)
 				return "nu <= 0 or nu > 1";
 
-		if(svm_type == svm_parameter.EPSILON_SVR)
+		if(svm_type == SvmParameter.EPSILON_SVR)
 			if(param.p < 0)
 				return "p < 0";
 
@@ -2765,12 +2764,12 @@ public class svm {
 			return "probability != 0 and probability != 1";
 
 		if(param.probability == 1 &&
-		   svm_type == svm_parameter.ONE_CLASS)
+		   svm_type == SvmParameter.ONE_CLASS)
 			return "one-class SVM probability output not supported yet";
 		
 		// check whether nu-svc is feasible
 	
-		if(svm_type == svm_parameter.NU_SVC)
+		if(svm_type == SvmParameter.NU_SVC)
 		{
 			int l = prob.l;
 			int max_nr_class = 16;
@@ -2824,18 +2823,18 @@ public class svm {
 		return null;
 	}
 
-	public static int svm_check_probability_model(svm_model model)
+	public static int svm_check_probability_model(Model model)
 	{
-		if (((model.param.svm_type == svm_parameter.C_SVC || model.param.svm_type == svm_parameter.NU_SVC) &&
+		if (((model.param.svm_type == SvmParameter.C_SVC || model.param.svm_type == SvmParameter.NU_SVC) &&
 		model.probA!=null && model.probB!=null) ||
-		((model.param.svm_type == svm_parameter.EPSILON_SVR || model.param.svm_type == svm_parameter.NU_SVR) &&
+		((model.param.svm_type == SvmParameter.EPSILON_SVR || model.param.svm_type == SvmParameter.NU_SVR) &&
 		 model.probA!=null))
 			return 1;
 		else
 			return 0;
 	}
 
-	public static void svm_set_print_string_function(svm_print_interface print_func)
+	public static void svm_set_print_string_function(PrintInterface print_func)
 	{
 		if (print_func == null)
 			svm_print_string = svm_print_stdout;

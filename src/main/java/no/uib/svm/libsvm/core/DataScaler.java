@@ -4,7 +4,7 @@ import java.io.*;
 import java.util.Formatter;
 import java.util.StringTokenizer;
 
-class svm_scale
+class DataScaler
 {
 	private String line = null;
 	private double lower = -1.0;
@@ -345,7 +345,7 @@ class svm_scale
 
 	public static void main(String argv[]) throws IOException
 	{
-		svm_scale s = new svm_scale();
+		DataScaler s = new DataScaler();
 		s.run(argv);
 	}
 }

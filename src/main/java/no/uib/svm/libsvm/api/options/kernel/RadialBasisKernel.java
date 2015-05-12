@@ -1,6 +1,6 @@
 package no.uib.svm.libsvm.api.options.kernel;
 
-import no.uib.svm.libsvm.core.libsvm.svm_parameter;
+import no.uib.svm.libsvm.core.libsvm.SvmParameter;
 
 /**
  * Created by kristianhestetun on 05.05.15.
@@ -18,7 +18,7 @@ public class RadialBasisKernel extends Kernel {
     }
 
     @Override
-    public void fillSvmParameter(svm_parameter param) {
+    public void fillSvmParameter(SvmParameter param) {
         param.gamma = this.gamma;
     }
 

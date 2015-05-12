@@ -1,8 +1,8 @@
 package no.uib.svm.libsvm.api.options;
 
 import no.uib.svm.libsvm.core.libsvm.svm;
-import no.uib.svm.libsvm.core.libsvm.svm_model;
-import no.uib.svm.libsvm.core.svm_predict;
+import no.uib.svm.libsvm.core.libsvm.Model;
+import no.uib.svm.libsvm.core.SvmTester;
 
 import java.io.*;
 import java.util.logging.Logger;
@@ -16,7 +16,7 @@ public class PredictionWrapper {
             modelFilePath,
             testDataFilePath,
             outputFilePath;
-    private svm_model model;
+    private Model model;
 
     private Boolean predictProbability = false;
 
@@ -27,7 +27,7 @@ public class PredictionWrapper {
     public void predict() throws IOException {
         BufferedReader inputReader = getTestDataReader();
 
-        svm_predict.predict(
+        SvmTester.predict(
                 inputReader, getOutputStream(), this.model, booleanToInt(predictProbability));
     }
 
@@ -59,11 +59,11 @@ public class PredictionWrapper {
         this.outputFilePath = outputFilePath;
     }
 
-    public svm_model getModel() {
+    public Model getModel() {
         return model;
     }
 
-    public void setModel(svm_model model) {
+    public void setModel(Model model) {
         this.model = model;
     }
 

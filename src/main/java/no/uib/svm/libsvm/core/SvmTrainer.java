@@ -8,17 +8,17 @@ import java.io.IOException;
 import java.util.StringTokenizer;
 import java.util.Vector;
 
-public class svm_train {
-	private svm_parameter param;		// set by parse_command_line
-	private svm_problem prob;		// set by read_problem
-	private svm_model model;
+public class SvmTrainer {
+	private SvmParameter param;		// set by parse_command_line
+	private Problem prob;		// set by read_problem
+	private Model model;
 	private String input_file_name;		// set by parse_command_line
 	private String model_file_name;		// set by parse_command_line
 	private String error_msg;
 	private int cross_validation;
 	private int nr_fold;
 
-	private static svm_print_interface svm_print_null = new svm_print_interface()
+	private static PrintInterface svm_print_null = new PrintInterface()
 	{
 		public void print(String s) {}
 	};
@@ -66,8 +66,8 @@ public class svm_train {
 		double[] target = new double[prob.l];
 
 		svm.svm_cross_validation(prob,param,nr_fold,target);
-		if(param.svm_type == svm_parameter.EPSILON_SVR ||
-		   param.svm_type == svm_parameter.NU_SVR)
+		if(param.svm_type == SvmParameter.EPSILON_SVR ||
+		   param.svm_type == SvmParameter.NU_SVR)
 		{
 			for(i=0;i<prob.l;i++)
 			{
@@ -120,7 +120,7 @@ public class svm_train {
 
 	public static void main(String argv[]) throws IOException
 	{
-		svm_train t = new svm_train();
+		SvmTrainer t = new SvmTrainer();
 		t.run(argv);
 	}
 
@@ -143,12 +143,12 @@ public class svm_train {
 	private void parse_command_line(String argv[])
 	{
 		int i;
-		svm_print_interface print_func = null;	// default printing to stdout
+		PrintInterface print_func = null;	// default printing to stdout
 
-		param = new svm_parameter();
+		param = new SvmParameter();
 		// default values
-		param.svm_type = svm_parameter.C_SVC;
-		param.kernel_type = svm_parameter.RBF;
+		param.svm_type = SvmParameter.C_SVC;
+		param.kernel_type = SvmParameter.RBF;
 		param.degree = 3;
 		param.gamma = 0;	// 1/num_features
 		param.coef0 = 0;
@@ -269,7 +269,7 @@ public class svm_train {
 	{
 		BufferedReader fp = new BufferedReader(new FileReader(input_file_name));
 		Vector<Double> vy = new Vector<Double>();
-		Vector<svm_node[]> vx = new Vector<svm_node[]>();
+		Vector<Node[]> vx = new Vector<Node[]>();
 		int max_index = 0;
 
 		while(true)
@@ -281,10 +281,10 @@ public class svm_train {
 
 			vy.addElement(atof(st.nextToken()));
 			int m = st.countTokens()/2;
-			svm_node[] x = new svm_node[m];
+			Node[] x = new Node[m];
 			for(int j=0;j<m;j++)
 			{
-				x[j] = new svm_node();
+				x[j] = new Node();
 				x[j].index = atoi(st.nextToken());
 				x[j].value = atof(st.nextToken());
 			}
@@ -292,9 +292,9 @@ public class svm_train {
 			vx.addElement(x);
 		}
 
-		prob = new svm_problem();
+		prob = new Problem();
 		prob.l = vy.size();
-		prob.x = new svm_node[prob.l][];
+		prob.x = new Node[prob.l][];
 		for(int i=0;i<prob.l;i++)
 			prob.x[i] = vx.elementAt(i);
 		prob.y = new double[prob.l];
@@ -304,7 +304,7 @@ public class svm_train {
 		if(param.gamma == 0 && max_index > 0)
 			param.gamma = 1.0/max_index;
 
-		if(param.kernel_type == svm_parameter.PRECOMPUTED)
+		if(param.kernel_type == SvmParameter.PRECOMPUTED)
 			for(int i=0;i<prob.l;i++)
 			{
 				if (prob.x[i][0].index != 0)
@@ -330,15 +330,15 @@ public class svm_train {
 		this.model_file_name = model_file_name;
 	}
 
-    public void setParam(svm_parameter param) {
+    public void setParam(SvmParameter param) {
         this.param = param;
     }
 
-    public svm_problem getProb() {
+    public Problem getProb() {
         return prob;
     }
 
-    public svm_parameter getParam() {
+    public SvmParameter getParam() {
         return param;
     }
 }
