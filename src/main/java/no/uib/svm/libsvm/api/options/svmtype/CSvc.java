@@ -3,7 +3,8 @@ package no.uib.svm.libsvm.api.options.svmtype;
 import no.uib.svm.libsvm.core.libsvm.SvmParameter;
 
 /**
- * Created by kristianhestetun on 05.05.15.
+ * Cost Support Vector Classification
+ * Default SVM-type in libSVM
  */
 public class CSvc extends SvmType {
 
@@ -25,10 +26,23 @@ public class CSvc extends SvmType {
         param.weight = this.weight;
     }
 
-    private double C;    // for C_SVC, EPSILON_SVR and NU_SVR
+    /**
+     * Cost
+     * for C_SVC, EPSILON_SVR and NU_SVR
+     * default: 1
+     */
+    private double C;
+
+    /**
+     * Set the parameter C of class i to weight*C,
+     * for C-SVC.
+     * default: 1
+     */
+    private double[] weight;
+
     private int nr_weight;        // for C_SVC
     private int[] weight_label;    // for C_SVC
-    private double[] weight;        // for C_SVC
+
 
     public final static CSvc defaultCsvc = new CSvc(
             DEFAULT_C,DEFAULT_NR_WEIGHT, DEFAULT_WEIGHT_LABEL, DEFAULT_WEIGHT);

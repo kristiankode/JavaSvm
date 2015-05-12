@@ -3,7 +3,7 @@ package no.uib.svm.libsvm.api.options.kernel;
 import no.uib.svm.libsvm.core.libsvm.SvmParameter;
 
 /**
- * Created by kristianhestetun on 05.05.15.
+ * polynomial: (gamma*u'*v + coef0)^degree
  */
 public class PolynomialKernel extends Kernel {
 

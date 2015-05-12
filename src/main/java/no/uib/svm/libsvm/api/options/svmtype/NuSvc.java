@@ -3,7 +3,7 @@ package no.uib.svm.libsvm.api.options.svmtype;
 import no.uib.svm.libsvm.core.libsvm.SvmParameter;
 
 /**
- * Created by kristianhestetun on 05.05.15.
+ * Nu Support Vector Classification
  */
 public class NuSvc extends SvmType {
 
@@ -22,7 +22,11 @@ public class NuSvc extends SvmType {
         return "Nu SVC";
     }
 
-    private double nu;    // for NU_SVC, ONE_CLASS, and NU_SVR
+    /**
+     * The parameter nu of nu-SVC, one-class SVM, and nu-SVR
+     * default: 0.5
+     */
+    private double nu;
 
     public final static NuSvc defaultNuSvc = new NuSvc(
             DEFAULT_NU);

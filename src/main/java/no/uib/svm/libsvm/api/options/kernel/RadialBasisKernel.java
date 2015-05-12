@@ -3,7 +3,7 @@ package no.uib.svm.libsvm.api.options.kernel;
 import no.uib.svm.libsvm.core.libsvm.SvmParameter;
 
 /**
- * Created by kristianhestetun on 05.05.15.
+ * Radial basis function: exp(-gamma*|u-v|^2)
  */
 public class RadialBasisKernel extends Kernel {
 

@@ -22,6 +22,10 @@ public class OneClassSvm extends SvmType {
         return "One class";
     }
 
+    /**
+     * The parameter nu of nu-SVC, one-class SVM, and nu-SVR
+     * default: 0.5
+     */
     private double nu;    // for NU_SVC, ONE_CLASS, and NU_SVR
 
     public final static OneClassSvm defaultOneClass = new OneClassSvm(

@@ -3,7 +3,7 @@ package no.uib.svm.libsvm.api.options.svmtype;
 import no.uib.svm.libsvm.core.libsvm.SvmParameter;
 
 /**
- * Created by kristianhestetun on 05.05.15.
+ * Nu Support Vector Regression
  */
 public class NuSvr extends SvmType {
 
@@ -22,7 +22,18 @@ public class NuSvr extends SvmType {
     public String getName() {
         return "Nu SVR";
     }
+
+    /**
+     * Cost
+     * for C_SVC, EPSILON_SVR and NU_SVR
+     * default: 1
+     */
     private double C;    // for C_SVC, EPSILON_SVR and NU_SVR
+
+    /**
+     * The parameter nu of nu-SVC, one-class SVM, and nu-SVR
+     * default: 0.5
+     */
     public double nu;    // for NU_SVC, ONE_CLASS, and NU_SVR
 
     public final static NuSvr defaultNuSvr = new NuSvr(

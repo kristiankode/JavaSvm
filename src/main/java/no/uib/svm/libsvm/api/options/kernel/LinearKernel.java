@@ -4,6 +4,7 @@ import no.uib.svm.libsvm.core.libsvm.SvmParameter;
 
 /**
  * Created by kristianhestetun on 05.05.15.
+ * u'*v
  */
 public class LinearKernel extends Kernel {
 
