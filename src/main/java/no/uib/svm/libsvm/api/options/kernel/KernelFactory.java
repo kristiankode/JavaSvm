@@ -8,4 +8,6 @@ import java.util.List;
  */
 public interface KernelFactory {
     List<Kernel> getAvailableKernels();
+
+    Kernel getDefault();
 }

@@ -20,4 +20,9 @@ public class KernelFactoryImpl implements KernelFactory {
     public List<Kernel> getAvailableKernels() {
         return availableKernels;
     }
+
+    @Override
+    public Kernel getDefault(){
+        return new LinearKernel();
+    }
 }
