@@ -19,19 +19,12 @@ public class TrainingWrapper {
 
     static final Logger logger = Logger.getLogger(String.valueOf(TrainingWrapper.class));
 
-    // Usage: svm_train [options] training_set_file [model_file]\n
-    private Kernel selectedKernel = new LinearKernel();
-    private SvmProducer svmFactory = new SvmProducerImpl();
-    private KernelFactory kernelFactory = new KernelFactoryImpl();
-    private SvmType selectedSvmType = svmFactory.getDefault();
-
-    private SvmTrainer trainingEngine = new SvmTrainer();
-
-    // these are for training only
-    public double cache_size = 100; // in MB
-    public double eps = 1e-3;    // stopping criteria
-    public int shrinking = 1;    // use the shrinking heuristics
-    public int probability = 0; // do probability estimates
+    SvmProducer svmFactory = new SvmProducerImpl();
+    SvmType selectedSvmType = svmFactory.getDefault();
+    KernelFactory kernelFactory = new KernelFactoryImpl();
+    Kernel selectedKernel = kernelFactory.getDefault();
+    SvmTrainer trainingEngine = new SvmTrainer();
+    Configurator configurator = new Configurator();
 
     // filenames
     private String inputFile = "";
@@ -43,26 +36,8 @@ public class TrainingWrapper {
     private List<Kernel> availableKernels = kernelFactory.getAvailableKernels();
     private List<SvmType> availableSvmTypes = svmFactory.getAvailableTypes();
 
-    /**
-     * Creates an SvmParameter with values corresponding to class fields.
-     * @return SvmParams with same values as this class.
-     */
-    private SvmParameter fillSvmParam() {
-        SvmParameter param = new SvmParameter();
-
-        param.cache_size = this.cache_size;
-        param.eps = this.eps;
-        param.shrinking = this.shrinking;
-        param.probability = this.probability;
-
-        selectedSvmType.fillSvmParameter(param);
-        selectedKernel.fillSvmParameter(param);
-
-        return param;
-    }
-
     public void updateTrainingParams() {
-        trainingEngine.setParam(fillSvmParam());
+        trainingEngine.setParam(configurator.getConfiguration(selectedSvmType, selectedKernel));
     }
 
     /**
