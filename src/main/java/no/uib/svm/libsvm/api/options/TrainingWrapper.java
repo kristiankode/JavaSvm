@@ -1,15 +1,19 @@
 package no.uib.svm.libsvm.api.options;
 
-import no.uib.svm.libsvm.api.options.kernel.*;
-import no.uib.svm.libsvm.api.options.svmtype.*;
-import no.uib.svm.libsvm.core.libsvm.svm;
+import no.uib.svm.libsvm.api.options.kernel.Kernel;
+import no.uib.svm.libsvm.api.options.kernel.KernelFactory;
+import no.uib.svm.libsvm.api.options.kernel.KernelFactoryImpl;
+import no.uib.svm.libsvm.api.options.logging.Messages;
+import no.uib.svm.libsvm.api.options.svmtype.SvmProducer;
+import no.uib.svm.libsvm.api.options.svmtype.SvmProducerImpl;
+import no.uib.svm.libsvm.api.options.svmtype.SvmType;
 import no.uib.svm.libsvm.core.libsvm.Model;
+import no.uib.svm.libsvm.core.libsvm.Problem;
 import no.uib.svm.libsvm.core.libsvm.SvmParameter;
-import no.uib.svm.libsvm.core.SvmTrainer;
+import no.uib.svm.libsvm.core.libsvm.svm;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.logging.Logger;
 
 /**
  * Class that trains an SVM.
@@ -17,14 +21,19 @@ import java.util.logging.Logger;
  */
 public class TrainingWrapper {
 
-    static final Logger logger = Logger.getLogger(String.valueOf(TrainingWrapper.class));
+    // GUI messages
+    Messages msg = new Messages();
 
+    // dependencies
     SvmProducer svmFactory = new SvmProducerImpl();
     SvmType selectedSvmType = svmFactory.getDefault();
     KernelFactory kernelFactory = new KernelFactoryImpl();
     Kernel selectedKernel = kernelFactory.getDefault();
-    SvmTrainer trainingEngine = new SvmTrainer();
     Configurator configurator = new Configurator();
+
+    // state
+    Problem problem = null;
+    SvmParameter configuration;
 
     // filenames
     private String inputFile = "";
@@ -36,23 +45,20 @@ public class TrainingWrapper {
     private List<Kernel> availableKernels = kernelFactory.getAvailableKernels();
     private List<SvmType> availableSvmTypes = svmFactory.getAvailableTypes();
 
-    public void updateTrainingParams() {
-        trainingEngine.setParam(configurator.getConfiguration(selectedSvmType, selectedKernel));
-    }
-
     /**
      * Loads training data from file. Data must be in SvmLight-format.
+     *
      * @throws IOException
      */
     public void loadTrainingDataFromFile() throws IOException {
-        updateTrainingParams();
-        trainingEngine.setInput_file_name(inputFile);
-        trainingEngine.read_problem();
-        logger.info("file loaded successfully");
+        configuration = configurator.getConfiguration(selectedSvmType, selectedKernel);
+        problem = ProblemLoader.loadProblemFromFile(inputFile, configuration);
+        msg.print("file loaded successfully");
     }
 
     /**
      * Trains the model using the selected parameters.
+     *
      * @return
      * @throws IOException
      */
@@ -60,7 +66,7 @@ public class TrainingWrapper {
         loadTrainingDataFromFile();
         if (isParametersValid()) {
             Model model =
-                    svm.svm_train(trainingEngine.getProb(), trainingEngine.getParam());
+                    svm.svm_train(problem, configuration);
 
             svm.svm_save_model(inputFile + ".model", model);
 
@@ -71,9 +77,9 @@ public class TrainingWrapper {
 
     public boolean isParametersValid() {
         String error = svm.svm_check_parameter(
-                trainingEngine.getProb(), trainingEngine.getParam());
-        if(error != null){
-            Logger.getAnonymousLogger().info("Parameters invalid: " + error);
+                problem, configuration);
+        if (error != null) {
+            msg.print("Parameters invalid: " + error);
         }
         return error == null;
     }
@@ -110,11 +116,4 @@ public class TrainingWrapper {
         this.selectedKernel = selectedKernel;
     }
 
-    public String getTrainingOutputFile() {
-        return trainingOutputFile;
-    }
-
-    public void setTrainingOutputFile(String trainingOutputFile) {
-        this.trainingOutputFile = trainingOutputFile;
-    }
 }

@@ -1,5 +1,6 @@
 package no.uib.svm.libsvm.core;
 
+import no.uib.svm.libsvm.api.options.logging.Messages;
 import no.uib.svm.libsvm.core.libsvm.*;
 
 import java.io.BufferedReader;
@@ -18,10 +19,7 @@ public class SvmTrainer {
     private int cross_validation;
     private int nr_fold;
 
-    private static PrintInterface svm_print_null = new PrintInterface() {
-        public void print(String s) {
-        }
-    };
+    private static PrintInterface svm_print_null = new Messages();
 
     private static void exit_with_help() {
         System.out.print(

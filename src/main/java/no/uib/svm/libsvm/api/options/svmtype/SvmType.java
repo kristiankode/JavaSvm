@@ -3,7 +3,7 @@ package no.uib.svm.libsvm.api.options.svmtype;
 import no.uib.svm.libsvm.core.libsvm.SvmParameter;
 
 /**
- * Created by kristianhestetun on 05.05.15.
+ * Created by kristian
  */
 public abstract class SvmType {
     /* svm_type */
