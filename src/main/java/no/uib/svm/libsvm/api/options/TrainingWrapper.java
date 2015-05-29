@@ -8,7 +8,6 @@ import no.uib.svm.libsvm.core.libsvm.SvmParameter;
 import no.uib.svm.libsvm.core.SvmTrainer;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -22,8 +21,9 @@ public class TrainingWrapper {
 
     // Usage: svm_train [options] training_set_file [model_file]\n
     private Kernel selectedKernel = new LinearKernel();
-    private SvmProducer producer = new SvmProducerImpl();
-    private SvmType selectedSvmType = producer.getDefault();
+    private SvmProducer svmFactory = new SvmProducerImpl();
+    private KernelFactory kernelFactory = new KernelFactoryImpl();
+    private SvmType selectedSvmType = svmFactory.getDefault();
 
     private SvmTrainer trainingEngine = new SvmTrainer();
 
@@ -40,14 +40,8 @@ public class TrainingWrapper {
     // Outputs
     private String trainingResultInfo;
 
-    private List<Kernel> availableKernels = Arrays.asList(
-            PolynomialKernel.defaultPolynomialKernel,
-            RadialBasisKernel.defaultRadialBasisKernel,
-            new PrecomputedKernel(),
-            new SigmoidKernel(),
-            new LinearKernel());
-
-    private List<SvmType> availableSvmTypes = producer.getAvailableTypes();
+    private List<Kernel> availableKernels = kernelFactory.getAvailableKernels();
+    private List<SvmType> availableSvmTypes = svmFactory.getAvailableTypes();
 
     /**
      * Creates an SvmParameter with values corresponding to class fields.

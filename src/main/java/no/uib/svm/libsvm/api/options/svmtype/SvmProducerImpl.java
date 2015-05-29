@@ -9,7 +9,7 @@ import java.util.List;
  */
 public class SvmProducerImpl implements SvmProducer {
 
-    List<SvmType> availableTypes = Arrays.asList(
+    private static List<SvmType> availableTypes = Arrays.asList(
             CSvc.defaultCsvc,
             EpsilonSvr.defaultEpsilonSvr,
             NuSvc.defaultNuSvc,
