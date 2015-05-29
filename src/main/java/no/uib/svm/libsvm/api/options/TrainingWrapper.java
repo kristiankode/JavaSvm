@@ -7,10 +7,7 @@ import no.uib.svm.libsvm.api.options.logging.Messages;
 import no.uib.svm.libsvm.api.options.svmtype.SvmProducer;
 import no.uib.svm.libsvm.api.options.svmtype.SvmProducerImpl;
 import no.uib.svm.libsvm.api.options.svmtype.SvmType;
-import no.uib.svm.libsvm.core.libsvm.Model;
-import no.uib.svm.libsvm.core.libsvm.Problem;
-import no.uib.svm.libsvm.core.libsvm.SvmParameter;
-import no.uib.svm.libsvm.core.libsvm.svm;
+import no.uib.svm.libsvm.core.libsvm.*;
 
 import java.io.IOException;
 import java.util.List;
@@ -19,8 +16,9 @@ import java.util.List;
  * Class that trains an SVM.
  * The result is a model which can be used for prediction.
  */
-public class TrainingWrapper {
+public class TrainingWrapper implements Trainer {
 
+    public static final String MODEL_FILE_SUFFIX = ".model";
     // GUI messages
     Messages msg = new Messages();
 
@@ -37,10 +35,7 @@ public class TrainingWrapper {
 
     // filenames
     private String inputFile = "";
-    private String trainingOutputFile = "result.model";
-
-    // Outputs
-    private String trainingResultInfo;
+    private String trainingOutputFile = inputFile + MODEL_FILE_SUFFIX;
 
     private List<Kernel> availableKernels = kernelFactory.getAvailableKernels();
     private List<SvmType> availableSvmTypes = svmFactory.getAvailableTypes();
@@ -50,6 +45,7 @@ public class TrainingWrapper {
      *
      * @throws IOException
      */
+    @Override
     public void loadTrainingDataFromFile() throws IOException {
         configuration = configurator.getConfiguration(selectedSvmType, selectedKernel);
         problem = ProblemLoader.loadProblemFromFile(inputFile, configuration);
@@ -62,20 +58,21 @@ public class TrainingWrapper {
      * @return
      * @throws IOException
      */
+    @Override
     public Model train() throws IOException {
         loadTrainingDataFromFile();
         if (isParametersValid()) {
-            Model model =
-                    svm.svm_train(problem, configuration);
+            svm.setPrintInterface(msg);
 
-            svm.svm_save_model(inputFile + ".model", model);
+            SvmModel model = svm.svm_train(problem, configuration);
+            svm.svm_save_model(trainingOutputFile, model);
 
             return model;
         }
         return null;
     }
 
-    public boolean isParametersValid() {
+    private boolean isParametersValid() {
         String error = svm.svm_check_parameter(
                 problem, configuration);
         if (error != null) {
@@ -84,34 +81,43 @@ public class TrainingWrapper {
         return error == null;
     }
 
+    @Override
     public String getInputFile() {
         return inputFile;
     }
 
+    @Override
     public void setInputFile(String inputFile) {
         this.inputFile = inputFile;
+        this.trainingOutputFile = inputFile + MODEL_FILE_SUFFIX;
     }
 
+    @Override
     public List<Kernel> getAvailableKernels() {
         return this.availableKernels;
     }
 
+    @Override
     public List<SvmType> getAvailableSvmTypes() {
         return availableSvmTypes;
     }
 
+    @Override
     public SvmType getSelectedSvmType() {
         return selectedSvmType;
     }
 
+    @Override
     public void setSelectedSvmType(SvmType selectedSvmType) {
         this.selectedSvmType = selectedSvmType;
     }
 
+    @Override
     public Kernel getSelectedKernel() {
         return selectedKernel;
     }
 
+    @Override
     public void setSelectedKernel(Kernel selectedKernel) {
         this.selectedKernel = selectedKernel;
     }

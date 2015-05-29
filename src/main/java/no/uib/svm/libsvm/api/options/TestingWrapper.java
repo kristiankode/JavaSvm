@@ -1,7 +1,8 @@
 package no.uib.svm.libsvm.api.options;
 
-import no.uib.svm.libsvm.core.libsvm.svm;
 import no.uib.svm.libsvm.core.libsvm.Model;
+import no.uib.svm.libsvm.core.libsvm.svm;
+import no.uib.svm.libsvm.core.libsvm.SvmModel;
 import no.uib.svm.libsvm.core.SvmTester;
 
 import java.io.*;

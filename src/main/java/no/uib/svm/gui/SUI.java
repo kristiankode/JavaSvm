@@ -18,10 +18,12 @@ import javafx.scene.control.*;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import no.uib.svm.libsvm.api.options.TestingWrapper;
+import no.uib.svm.libsvm.api.options.Trainer;
 import no.uib.svm.libsvm.api.options.TrainingWrapper;
 import no.uib.svm.libsvm.api.options.kernel.*;
 import no.uib.svm.libsvm.api.options.svmtype.*;
 import no.uib.svm.libsvm.core.libsvm.Model;
+import no.uib.svm.libsvm.core.libsvm.SvmModel;
 
 import java.io.File;
 import java.io.IOException;
@@ -85,7 +87,7 @@ public class SUI extends Application implements Initializable {
     @FXML
     private Label numberOfClassesLabel;
 
-    private TrainingWrapper trainingWrapper;
+    private Trainer trainingWrapper;
     private TestingWrapper predictionWrapper;
     private Stage currentStage;
 
@@ -403,13 +405,13 @@ public class SUI extends Application implements Initializable {
     }
 
     private void updateModelInfo(Model model){
-        numberOfClassesLabel.setText(String.valueOf(model.nr_class));
+        numberOfClassesLabel.setText(String.valueOf(model.getNr_class()));
 
         updateClassTableWithModel();
     }
 
     private void updateClassTableWithModel(){
-        List<Integer> labelList = intArrayToList(predictionWrapper.getModel().label);
+        List<Integer> labelList = intArrayToList(predictionWrapper.getModel().getLabel());
         ObservableList<Integer> labels = FXCollections.observableArrayList(labelList);
         classTable.setItems(labels);
     }

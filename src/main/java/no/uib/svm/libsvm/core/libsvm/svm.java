@@ -1,4 +1,6 @@
 package no.uib.svm.libsvm.core.libsvm;
+import no.uib.svm.libsvm.api.options.logging.Messages;
+
 import java.io.*;
 import java.util.*;
 
@@ -1288,19 +1290,20 @@ public class svm {
 	//
 	// construct and solve various formulations
 	//
-	public static final int LIBSVM_VERSION=320; 
+	public static final int LIBSVM_VERSION=320;
 	public static final Random rand = new Random();
 
-	private static PrintInterface svm_print_stdout = new PrintInterface()
-	{
-		public void print(String s)
-		{
-			System.out.print(s);
-			System.out.flush();
-		}
-	};
-
+	private static PrintInterface svm_print_stdout = new Messages();
 	private static PrintInterface svm_print_string = svm_print_stdout;
+
+	public static void setPrintInterface(PrintInterface printInterface){
+		svm_print_stdout = printInterface;
+		svm_print_string = svm_print_stdout;
+	}
+
+	public PrintInterface getPrintInterface(){
+		return svm_print_stdout;
+	}
 
 	static void info(String s) 
 	{
@@ -1800,7 +1803,7 @@ public class svm {
 				subparam.weight_label[1]=-1;
 				subparam.weight[0]=Cp;
 				subparam.weight[1]=Cn;
-				Model submodel = svm_train(subprob,subparam);
+				SvmModel submodel = svm_train(subprob,subparam);
 				for(j=begin;j<end;j++)
 				{
 					double[] dec_value=new double[1];
@@ -1927,9 +1930,9 @@ public class svm {
 	//
 	// Interface functions
 	//
-	public static Model svm_train(Problem prob, SvmParameter param)
+	public static SvmModel svm_train(Problem prob, SvmParameter param)
 	{
-		Model model = new Model();
+		SvmModel model = new SvmModel();
 		model.param = param;
 
 		if(param.svm_type == SvmParameter.ONE_CLASS ||
@@ -2259,7 +2262,7 @@ public class svm {
 				subprob.y[k] = prob.y[perm[j]];
 				++k;
 			}
-			Model submodel = svm_train(subprob,param);
+			SvmModel submodel = svm_train(subprob,param);
 			if(param.probability==1 &&
 			   (param.svm_type == SvmParameter.C_SVC ||
 			    param.svm_type == SvmParameter.NU_SVC))
@@ -2276,38 +2279,38 @@ public class svm {
 
 	public static int svm_get_svm_type(Model model)
 	{
-		return model.param.svm_type;
+		return model.getParam().svm_type;
 	}
 
 	public static int svm_get_nr_class(Model model)
 	{
-		return model.nr_class;
+		return model.getNr_class();
 	}
 
 	public static void svm_get_labels(Model model, int[] label)
 	{
-		if (model.label != null)
-			for(int i=0;i<model.nr_class;i++)
-				label[i] = model.label[i];
+		if (model.getLabel() != null)
+			for(int i=0;i<model.getNr_class();i++)
+				label[i] = model.getLabel()[i];
 	}
 
-	public static void svm_get_sv_indices(Model model, int[] indices)
+	public static void svm_get_sv_indices(SvmModel model, int[] indices)
 	{
 		if (model.sv_indices != null)
 			for(int i=0;i<model.l;i++)
 				indices[i] = model.sv_indices[i];
 	}
 
-	public static int svm_get_nr_sv(Model model)
+	public static int svm_get_nr_sv(SvmModel model)
 	{
 		return model.l;
 	}
 
 	public static double svm_get_svr_probability(Model model)
 	{
-		if ((model.param.svm_type == SvmParameter.EPSILON_SVR || model.param.svm_type == SvmParameter.NU_SVR) &&
-		    model.probA!=null)
-		return model.probA[0];
+		if ((model.getParam().svm_type == SvmParameter.EPSILON_SVR || model.getParam().svm_type == SvmParameter.NU_SVR) &&
+		    model.getProbA()!=null)
+		return model.getProbA()[0];
 		else
 		{
 			System.err.print("Model doesn't contain information for SVR probability inference\n");
@@ -2318,35 +2321,35 @@ public class svm {
 	public static double svm_predict_values(Model model, Node[] x, double[] dec_values)
 	{
 		int i;
-		if(model.param.svm_type == SvmParameter.ONE_CLASS ||
-		   model.param.svm_type == SvmParameter.EPSILON_SVR ||
-		   model.param.svm_type == SvmParameter.NU_SVR)
+		if(model.getParam().svm_type == SvmParameter.ONE_CLASS ||
+		   model.getParam().svm_type == SvmParameter.EPSILON_SVR ||
+		   model.getParam().svm_type == SvmParameter.NU_SVR)
 		{
-			double[] sv_coef = model.sv_coef[0];
+			double[] sv_coef = model.getSv_coef()[0];
 			double sum = 0;
-			for(i=0;i<model.l;i++)
-				sum += sv_coef[i] * Kernel.k_function(x,model.SV[i],model.param);
-			sum -= model.rho[0];
+			for(i=0;i<model.getL();i++)
+				sum += sv_coef[i] * Kernel.k_function(x,model.getSV()[i],model.getParam());
+			sum -= model.getRho()[0];
 			dec_values[0] = sum;
 
-			if(model.param.svm_type == SvmParameter.ONE_CLASS)
+			if(model.getParam().svm_type == SvmParameter.ONE_CLASS)
 				return (sum>0)?1:-1;
 			else
 				return sum;
 		}
 		else
 		{
-			int nr_class = model.nr_class;
-			int l = model.l;
+			int nr_class = model.getNr_class();
+			int l = model.getL();
 		
 			double[] kvalue = new double[l];
 			for(i=0;i<l;i++)
-				kvalue[i] = Kernel.k_function(x,model.SV[i],model.param);
+				kvalue[i] = Kernel.k_function(x,model.getSV()[i],model.getParam());
 
 			int[] start = new int[nr_class];
 			start[0] = 0;
 			for(i=1;i<nr_class;i++)
-				start[i] = start[i-1]+model.nSV[i-1];
+				start[i] = start[i-1]+model.getnSV()[i-1];
 
 			int[] vote = new int[nr_class];
 			for(i=0;i<nr_class;i++)
@@ -2359,17 +2362,17 @@ public class svm {
 					double sum = 0;
 					int si = start[i];
 					int sj = start[j];
-					int ci = model.nSV[i];
-					int cj = model.nSV[j];
+					int ci = model.getnSV()[i];
+					int cj = model.getnSV()[j];
 				
 					int k;
-					double[] coef1 = model.sv_coef[j-1];
-					double[] coef2 = model.sv_coef[i];
+					double[] coef1 = model.getSv_coef()[j-1];
+					double[] coef2 = model.getSv_coef()[i];
 					for(k=0;k<ci;k++)
 						sum += coef1[si+k] * kvalue[si+k];
 					for(k=0;k<cj;k++)
 						sum += coef2[sj+k] * kvalue[sj+k];
-					sum -= model.rho[p];
+					sum -= model.getRho()[p];
 					dec_values[p] = sum;					
 
 					if(dec_values[p] > 0)
@@ -2384,17 +2387,17 @@ public class svm {
 				if(vote[i] > vote[vote_max_idx])
 					vote_max_idx = i;
 
-			return model.label[vote_max_idx];
+			return model.getLabel()[vote_max_idx];
 		}
 	}
 
 	public static double svm_predict(Model model, Node[] x)
 	{
-		int nr_class = model.nr_class;
+		int nr_class = model.getNr_class();
 		double[] dec_values;
-		if(model.param.svm_type == SvmParameter.ONE_CLASS ||
-				model.param.svm_type == SvmParameter.EPSILON_SVR ||
-				model.param.svm_type == SvmParameter.NU_SVR)
+		if(model.getParam().svm_type == SvmParameter.ONE_CLASS ||
+				model.getParam().svm_type == SvmParameter.EPSILON_SVR ||
+				model.getParam().svm_type == SvmParameter.NU_SVR)
 			dec_values = new double[1];
 		else
 			dec_values = new double[nr_class*(nr_class-1)/2];
@@ -2404,11 +2407,11 @@ public class svm {
 
 	public static double svm_predict_probability(Model model, Node[] x, double[] prob_estimates)
 	{
-		if ((model.param.svm_type == SvmParameter.C_SVC || model.param.svm_type == SvmParameter.NU_SVC) &&
-		    model.probA!=null && model.probB!=null)
+		if ((model.getParam().svm_type == SvmParameter.C_SVC || model.getParam().svm_type == SvmParameter.NU_SVC) &&
+		    model.getProbA() !=null && model.getProbB() !=null)
 		{
 			int i;
-			int nr_class = model.nr_class;
+			int nr_class = model.getNr_class();
 			double[] dec_values = new double[nr_class*(nr_class-1)/2];
 			svm_predict_values(model, x, dec_values);
 
@@ -2419,7 +2422,7 @@ public class svm {
 			for(i=0;i<nr_class;i++)
 				for(int j=i+1;j<nr_class;j++)
 				{
-					pairwise_prob[i][j]=Math.min(Math.max(sigmoid_predict(dec_values[k],model.probA[k],model.probB[k]),min_prob),1-min_prob);
+					pairwise_prob[i][j]=Math.min(Math.max(sigmoid_predict(dec_values[k],model.getProbA()[k],model.getProbB()[k]),min_prob),1-min_prob);
 					pairwise_prob[j][i]=1-pairwise_prob[i][j];
 					k++;
 				}
@@ -2429,7 +2432,7 @@ public class svm {
 			for(i=1;i<nr_class;i++)
 				if(prob_estimates[i] > prob_estimates[prob_max_idx])
 					prob_max_idx = i;
-			return model.label[prob_max_idx];
+			return model.getLabel()[prob_max_idx];
 		}
 		else 
 			return svm_predict(model, x);
@@ -2445,7 +2448,7 @@ public class svm {
 		"linear","polynomial","rbf","sigmoid","precomputed"
 	};
 
-	public static void svm_save_model(String model_file_name, Model model) throws IOException
+	public static void svm_save_model(String model_file_name, SvmModel model) throws IOException
 	{
 		DataOutputStream fp = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(model_file_name)));
 
@@ -2540,7 +2543,7 @@ public class svm {
 		return Integer.parseInt(s);
 	}
 
-	private static boolean read_model_header(BufferedReader fp, Model model)
+	private static boolean read_model_header(BufferedReader fp, SvmModel model)
 	{
 		SvmParameter param = new SvmParameter();
 		model.param = param;
@@ -2653,16 +2656,16 @@ public class svm {
 		return true;
 	}
 
-	public static Model svm_load_model(String model_file_name) throws IOException
+	public static SvmModel svm_load_model(String model_file_name) throws IOException
 	{
 		return svm_load_model(new BufferedReader(new FileReader(model_file_name)));
 	}
 
-	public static Model svm_load_model(BufferedReader fp) throws IOException
+	public static SvmModel svm_load_model(BufferedReader fp) throws IOException
 	{
 		// read parameters
 
-		Model model = new Model();
+		SvmModel model = new SvmModel();
 		model.rho = null;
 		model.probA = null;
 		model.probB = null;
@@ -2823,7 +2826,7 @@ public class svm {
 		return null;
 	}
 
-	public static int svm_check_probability_model(Model model)
+	public static int svm_check_probability_model(SvmModel model)
 	{
 		if (((model.param.svm_type == SvmParameter.C_SVC || model.param.svm_type == SvmParameter.NU_SVC) &&
 		model.probA!=null && model.probB!=null) ||

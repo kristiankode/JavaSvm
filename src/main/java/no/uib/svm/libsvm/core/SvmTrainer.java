@@ -12,7 +12,7 @@ import java.util.Vector;
 public class SvmTrainer {
     private SvmParameter param;        // set by parse_command_line
     private Problem prob;        // set by read_problem
-    private Model model;
+    private SvmModel model;
     private String input_file_name;        // set by parse_command_line
     private String model_file_name;        // set by parse_command_line
     private String error_msg;

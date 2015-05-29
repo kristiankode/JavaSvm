@@ -17,9 +17,9 @@ public class Messages implements PrintInterface {
 
     @Override
     public void print(String s) {
+        System.out.println(s);
         messages.add(s);
         limitNumberOfMessagesTo(LIMIT);
-
     }
 
     private void limitNumberOfMessagesTo(int limit) {

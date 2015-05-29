@@ -47,7 +47,9 @@ public class SvmTester {
         if (predict_probability == 1) {
             if (svm_type == SvmParameter.EPSILON_SVR ||
                     svm_type == SvmParameter.NU_SVR) {
-                SvmTester.info("Prob. model for test data: target value = predicted value + z,\nz: Laplace distribution e^(-|z|/sigma)/(2sigma),sigma=" + svm.svm_get_svr_probability(model) + "\n");
+                SvmTester.info("Prob. model for test data: target value = predicted value " +
+                        "+ z,\nz: Laplace distribution e^(-|z|/sigma)/(2sigma),sigma="
+                        + svm.svm_get_svr_probability(model) + "\n");
             } else {
                 int[] labels = new int[nr_class];
                 svm.svm_get_labels(model, labels);
@@ -141,7 +143,7 @@ public class SvmTester {
         try {
             BufferedReader input = new BufferedReader(new FileReader(argv[i]));
             DataOutputStream output = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(argv[i + 2])));
-            Model model = svm.svm_load_model(argv[i + 1]);
+            SvmModel model = svm.svm_load_model(argv[i + 1]);
             if (model == null) {
                 System.err.print("can't open model file " + argv[i + 1] + "\n");
                 System.exit(1);
