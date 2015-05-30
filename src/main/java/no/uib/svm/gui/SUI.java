@@ -17,7 +17,9 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import no.uib.svm.gui.utils.StringToArray;
+import no.uib.svm.gui.input.InputUpdater;
+import no.uib.svm.gui.input.KernelUpdater;
+import no.uib.svm.gui.input.SvmTypeUpdater;
 import no.uib.svm.libsvm.api.options.SvmFactoryImpl;
 import no.uib.svm.libsvm.api.options.kernel.Kernel;
 import no.uib.svm.libsvm.api.options.kernel.PolynomialKernel;
@@ -39,6 +41,8 @@ import java.util.logging.Logger;
 public class SUI extends Application implements Initializable {
 
     private final InputUpdater inputUpdater = new InputUpdater(this);
+    private final SvmTypeUpdater svmTypeUpdater = new SvmTypeUpdater(this);
+    private final KernelUpdater kernelUpdater = new KernelUpdater(this);
 
     public static void main(String[] args) {
         launch(SUI.class, args);
@@ -131,16 +135,7 @@ public class SUI extends Application implements Initializable {
                     @Override
                     public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
                         selectedKernel = availableKernels().get(newValue.intValue());
-                        inputUpdater.resetKernelParams();
-
-                        if (selectedKernel instanceof PolynomialKernel) {
-                            handlePolynomialKernelSelected((PolynomialKernel) selectedKernel);
-                        } else if (selectedKernel instanceof SigmoidKernel) {
-                            inputUpdater.handleSigmoidKernelSelected((SigmoidKernel) selectedKernel);
-                        } else if (selectedKernel instanceof RadialBasisKernel) {
-                            inputUpdater.handleRadialBasisKernelSelected((RadialBasisKernel) selectedKernel);
-                        }
-
+                        inputUpdater.updateKernelInput();
                     }
                 }
         );
@@ -160,20 +155,7 @@ public class SUI extends Application implements Initializable {
                     public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
                         selectedSvmType = availableSvmTypes().get(newValue.intValue());
                         svmTypeLabel.setText(selectedSvmType.toString() + " parameters");
-                        inputUpdater.resetSvmParams();
-
-                        if (selectedSvmType instanceof CSvc) {
-                            inputUpdater.handleCsvcSelected((CSvc) selectedSvmType);
-                        } else if (selectedSvmType instanceof NuSvc) {
-                            inputUpdater.handleNuSvcSelected((NuSvc) selectedSvmType);
-                        } else if (selectedSvmType instanceof NuSvr) {
-                            inputUpdater.handleNuSvrSelected((NuSvr) selectedSvmType);
-                        } else if (selectedSvmType instanceof EpsilonSvr) {
-                            inputUpdater.handleEpsilonSvrSelected((EpsilonSvr) selectedSvmType);
-                        } else if (selectedSvmType instanceof OneClassSvm) {
-                            inputUpdater.handleOneClassSvmSelected((OneClassSvm) selectedSvmType);
-                        }
-
+                        inputUpdater.updateSvmInput();
                     }
                 }
         );
@@ -181,98 +163,9 @@ public class SUI extends Application implements Initializable {
         svmTypeInput.getSelectionModel().selectLast();
     }
 
-    private void handlePolynomialKernelSelected(PolynomialKernel kernel) {
-        inputUpdater.updateInput(gammaInput, kernel.getGamma());
-        inputUpdater.updateInput(coef0Input, kernel.getCoef0());
-        inputUpdater.updateInput(degreeInput, kernel.getDegree());
-    }
-
-    /**
-     * Takes data from the text input and stores it in a kernel object
-     */
-    public void updateKernelParams() {
-        if (selectedKernel instanceof PolynomialKernel) {
-            updatePolynomialKernel((PolynomialKernel) selectedKernel);
-        } else if (selectedKernel instanceof RadialBasisKernel) {
-            updateRadialBasisKernel((RadialBasisKernel) selectedKernel);
-        } else if (selectedKernel instanceof SigmoidKernel) {
-            updateSigmoidKernel((SigmoidKernel) selectedKernel);
-        }
-    }
-
-    public void updateSVMTypeParams() {
-        if (selectedSvmType instanceof CSvc) {
-            updateCSVCType((CSvc) selectedSvmType);
-        } else if (selectedSvmType instanceof EpsilonSvr) {
-            updateEpsilonSVRType((EpsilonSvr) selectedSvmType);
-        } else if (selectedSvmType instanceof NuSvc) {
-            updateNUSVCType((NuSvc) selectedSvmType);
-        } else if (selectedSvmType instanceof NuSvr) {
-            updateNUSVRType((NuSvr) selectedSvmType);
-        } else if (selectedSvmType instanceof OneClassSvm) {
-            updateOneClassSVM((OneClassSvm) selectedSvmType);
-        }
-    }
-
-    private void updateOneClassSVM(OneClassSvm svm) {
-        svm.setNu(Double.parseDouble(paramNu.getText()));
-    }
-
-    private void updateNUSVRType(NuSvr svm) {
-        svm.setNu(Double.parseDouble(paramNu.getText()));
-        svm.setC(Double.parseDouble(paramC.getText()));
-    }
-
-    private void updateNUSVCType(NuSvc svm) {
-        svm.setNu(Double.parseDouble(paramNu.getText()));
-    }
-
-    private void updateEpsilonSVRType(EpsilonSvr svm) {
-        svm.setC(Double.parseDouble(paramC.getText()));
-        svm.setP(Double.parseDouble(paramP.getText()));
-    }
-
-    private void updateCSVCType(CSvc svm) {
-        svm.setC(Double.parseDouble(paramC.getText()));
-        svm.setNr_weight(Integer.parseInt(paramNrWeight.getText()));
-        svm.setWeight(StringToArray.convertToDoubleArray(paramWeight.getText()));
-        svm.setWeight_label(StringToArray.convertToIntArray(paramWeightLabel.getText()));
-    }
-
-    /**
-     * Takes data from the text inputs and stores it in a Sigmoid kernel Object
-     *
-     * @param kernel
-     */
-    private void updateSigmoidKernel(SigmoidKernel kernel) {
-        kernel.setGamma(Double.parseDouble(gammaInput.getText()));
-        kernel.setCoef0(Double.parseDouble(coef0Input.getText()));
-    }
-
-
-    /**
-     * Takes data from the text input and stores it in a Radial Basis Kernel object
-     *
-     * @param kernel
-     */
-    private void updateRadialBasisKernel(RadialBasisKernel kernel) {
-        kernel.setGamma(Double.parseDouble(gammaInput.getText()));
-    }
-
-    /**
-     * Takes data from the text inputs and stores it in a polynomial kernel object
-     *
-     * @param kernel
-     */
-    private void updatePolynomialKernel(PolynomialKernel kernel) {
-        kernel.setCoef0(Double.parseDouble(coef0Input.getText()));
-        kernel.setGamma(Double.parseDouble(gammaInput.getText()));
-        kernel.setDegree(kernel.getDegree());
-    }
-
     private void updateTrainingEngine() {
-        updateSVMTypeParams();
-        updateKernelParams();
+        svmTypeUpdater.updateSVMTypeParams();
+        kernelUpdater.updateKernelParams();
         svmTrainer.setSelectedKernel(selectedKernel);
         svmTrainer.setSelectedSvmType(selectedSvmType);
     }
@@ -404,6 +297,14 @@ public class SUI extends Application implements Initializable {
 
     public TextField getCoef0Input() {
         return coef0Input;
+    }
+
+    public Kernel getSelectedKernel() {
+        return selectedKernel;
+    }
+
+    public SvmType getSelectedSvmType() {
+        return selectedSvmType;
     }
 
     public void setSvmTrainer(SvmTrainer svmTrainer) {
