@@ -17,14 +17,9 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import no.uib.svm.gui.input.InputUpdater;
-import no.uib.svm.gui.input.KernelUpdater;
-import no.uib.svm.gui.input.SvmTypeUpdater;
+import no.uib.svm.gui.input.*;
 import no.uib.svm.libsvm.api.options.SvmFactoryImpl;
 import no.uib.svm.libsvm.api.options.kernel.Kernel;
-import no.uib.svm.libsvm.api.options.kernel.PolynomialKernel;
-import no.uib.svm.libsvm.api.options.kernel.RadialBasisKernel;
-import no.uib.svm.libsvm.api.options.kernel.SigmoidKernel;
 import no.uib.svm.libsvm.api.options.svmtype.*;
 import no.uib.svm.libsvm.api.options.testing.SvmTester;
 import no.uib.svm.libsvm.api.options.training.SvmTrainer;
@@ -40,7 +35,8 @@ import java.util.logging.Logger;
 
 public class SUI extends Application implements Initializable {
 
-    private final InputUpdater inputUpdater = new InputUpdater(this);
+    private final KernelInputUpdater kernelInputUpdater = new KernelInputUpdater(this);
+    private final SvmTypeInputUpdater svmTypeInputUpdater = new SvmTypeInputUpdater(this);
     private final SvmTypeUpdater svmTypeUpdater = new SvmTypeUpdater(this);
     private final KernelUpdater kernelUpdater = new KernelUpdater(this);
 
@@ -135,7 +131,7 @@ public class SUI extends Application implements Initializable {
                     @Override
                     public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
                         selectedKernel = availableKernels().get(newValue.intValue());
-                        inputUpdater.updateKernelInput();
+                        kernelInputUpdater.updateKernelInput();
                     }
                 }
         );
@@ -155,7 +151,7 @@ public class SUI extends Application implements Initializable {
                     public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
                         selectedSvmType = availableSvmTypes().get(newValue.intValue());
                         svmTypeLabel.setText(selectedSvmType.toString() + " parameters");
-                        inputUpdater.updateSvmInput();
+                        svmTypeInputUpdater.updateSvmInput();
                     }
                 }
         );
