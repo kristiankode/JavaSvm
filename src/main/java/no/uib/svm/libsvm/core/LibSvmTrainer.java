@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.util.StringTokenizer;
 import java.util.Vector;
 
-public class SvmTrainer {
+public class LibSvmTrainer {
     private SvmParameter param;        // set by parse_command_line
     private Problem prob;        // set by read_problem
     private SvmModel model;
@@ -106,7 +106,7 @@ public class SvmTrainer {
     }
 
     public static void main(String argv[]) throws IOException {
-        SvmTrainer t = new SvmTrainer();
+        LibSvmTrainer t = new LibSvmTrainer();
         t.run(argv);
     }
 

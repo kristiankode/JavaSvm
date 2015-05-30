@@ -8,7 +8,7 @@ import java.util.StringTokenizer;
 /**
  * Runs predictions on test data. Requires a trained model.
  */
-public class SvmTester {
+public class LibSvmTester {
     private static PrintInterface svm_print_null = new PrintInterface() {
         public void print(String s) {
         }
@@ -47,7 +47,7 @@ public class SvmTester {
         if (predict_probability == 1) {
             if (svm_type == SvmParameter.EPSILON_SVR ||
                     svm_type == SvmParameter.NU_SVR) {
-                SvmTester.info("Prob. model for test data: target value = predicted value " +
+                LibSvmTester.info("Prob. model for test data: target value = predicted value " +
                         "+ z,\nz: Laplace distribution e^(-|z|/sigma)/(2sigma),sigma="
                         + svm.svm_get_svr_probability(model) + "\n");
             } else {
@@ -99,13 +99,13 @@ public class SvmTester {
         }
         if (svm_type == SvmParameter.EPSILON_SVR ||
                 svm_type == SvmParameter.NU_SVR) {
-            SvmTester.info("Mean squared error = " + error / total + " (regression)\n");
-            SvmTester.info("Squared correlation coefficient = " +
+            LibSvmTester.info("Mean squared error = " + error / total + " (regression)\n");
+            LibSvmTester.info("Squared correlation coefficient = " +
                     ((total * sumvy - sumv * sumy) * (total * sumvy - sumv * sumy)) /
                             ((total * sumvv - sumv * sumv) * (total * sumyy - sumy * sumy)) +
                     " (regression)\n");
         } else
-            SvmTester.info("Accuracy = " + (double) correct / total * 100 +
+            LibSvmTester.info("Accuracy = " + (double) correct / total * 100 +
                     "% (" + correct + "/" + total + ") (classification)\n");
     }
 
@@ -155,7 +155,7 @@ public class SvmTester {
                 }
             } else {
                 if (svm.svm_check_probability_model(model) != 0) {
-                    SvmTester.info("Model supports probability estimates, but disabled in prediction.\n");
+                    LibSvmTester.info("Model supports probability estimates, but disabled in prediction.\n");
                 }
             }
             predict(input, output, model, predict_probability);

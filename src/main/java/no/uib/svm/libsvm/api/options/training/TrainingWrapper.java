@@ -1,5 +1,7 @@
-package no.uib.svm.libsvm.api.options;
+package no.uib.svm.libsvm.api.options.training;
 
+import no.uib.svm.libsvm.api.options.Configurator;
+import no.uib.svm.libsvm.api.options.ProblemLoader;
 import no.uib.svm.libsvm.api.options.kernel.Kernel;
 import no.uib.svm.libsvm.api.options.kernel.KernelFactory;
 import no.uib.svm.libsvm.api.options.kernel.KernelFactoryImpl;
@@ -16,7 +18,7 @@ import java.util.List;
  * Class that trains an SVM.
  * The result is a model which can be used for prediction.
  */
-public class TrainingWrapper implements Trainer {
+public class TrainingWrapper implements SvmTrainer {
 
     public static final String MODEL_FILE_SUFFIX = ".model";
     // GUI messages

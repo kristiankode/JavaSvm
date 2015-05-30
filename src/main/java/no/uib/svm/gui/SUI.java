@@ -1,6 +1,6 @@
 package no.uib.svm.gui;
 /**
- * Created by kristianhestetun on 05.05.15.
+ * GUI for svm
  */
 
 import javafx.application.Application;
@@ -17,13 +17,16 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import no.uib.svm.libsvm.api.options.TestingWrapper;
-import no.uib.svm.libsvm.api.options.Trainer;
-import no.uib.svm.libsvm.api.options.TrainingWrapper;
-import no.uib.svm.libsvm.api.options.kernel.*;
+import no.uib.svm.gui.utils.StringToArray;
+import no.uib.svm.libsvm.api.options.SvmFactoryImpl;
+import no.uib.svm.libsvm.api.options.kernel.Kernel;
+import no.uib.svm.libsvm.api.options.kernel.PolynomialKernel;
+import no.uib.svm.libsvm.api.options.kernel.RadialBasisKernel;
+import no.uib.svm.libsvm.api.options.kernel.SigmoidKernel;
 import no.uib.svm.libsvm.api.options.svmtype.*;
+import no.uib.svm.libsvm.api.options.testing.SvmTester;
+import no.uib.svm.libsvm.api.options.training.SvmTrainer;
 import no.uib.svm.libsvm.core.libsvm.Model;
-import no.uib.svm.libsvm.core.libsvm.SvmModel;
 
 import java.io.File;
 import java.io.IOException;
@@ -34,6 +37,8 @@ import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
 public class SUI extends Application implements Initializable {
+
+    private final InputUpdater inputUpdater = new InputUpdater(this);
 
     public static void main(String[] args) {
         launch(SUI.class, args);
@@ -87,10 +92,13 @@ public class SUI extends Application implements Initializable {
     @FXML
     private Label numberOfClassesLabel;
 
-    private Trainer trainingWrapper;
-    private TestingWrapper predictionWrapper;
     private Stage currentStage;
 
+    // dependencies
+    private SvmTrainer svmTrainer;
+    private SvmTester svmTester;
+
+    // selection
     private Kernel selectedKernel;
     private SvmType selectedSvmType;
 
@@ -101,14 +109,12 @@ public class SUI extends Application implements Initializable {
         Parent root = FXMLLoader.load(getClass().getResource("/SUI.fxml"));
         primaryStage.setScene(new Scene(root));
         primaryStage.show();
-
     }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-
-        trainingWrapper = new TrainingWrapper();
-        predictionWrapper = new TestingWrapper();
+        svmTrainer = SvmFactoryImpl.getTrainer();
+        svmTester = SvmFactoryImpl.getTester();
 
         initKernelInput();
         initSvmTypeInput();
@@ -125,14 +131,14 @@ public class SUI extends Application implements Initializable {
                     @Override
                     public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
                         selectedKernel = availableKernels().get(newValue.intValue());
-                        resetKernelParams();
+                        inputUpdater.resetKernelParams();
 
                         if (selectedKernel instanceof PolynomialKernel) {
                             handlePolynomialKernelSelected((PolynomialKernel) selectedKernel);
                         } else if (selectedKernel instanceof SigmoidKernel) {
-                            handleSigmoidKernelSelected((SigmoidKernel) selectedKernel);
+                            inputUpdater.handleSigmoidKernelSelected((SigmoidKernel) selectedKernel);
                         } else if (selectedKernel instanceof RadialBasisKernel) {
-                            handleRadialBasisKernelSelected((RadialBasisKernel) selectedKernel);
+                            inputUpdater.handleRadialBasisKernelSelected((RadialBasisKernel) selectedKernel);
                         }
 
                     }
@@ -154,18 +160,18 @@ public class SUI extends Application implements Initializable {
                     public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
                         selectedSvmType = availableSvmTypes().get(newValue.intValue());
                         svmTypeLabel.setText(selectedSvmType.toString() + " parameters");
-                        resetSvmParams();
+                        inputUpdater.resetSvmParams();
 
                         if (selectedSvmType instanceof CSvc) {
-                            handleCsvcSelected((CSvc) selectedSvmType);
+                            inputUpdater.handleCsvcSelected((CSvc) selectedSvmType);
                         } else if (selectedSvmType instanceof NuSvc) {
-                            handleNuSvcSelected((NuSvc) selectedSvmType);
+                            inputUpdater.handleNuSvcSelected((NuSvc) selectedSvmType);
                         } else if (selectedSvmType instanceof NuSvr) {
-                            handleNuSvrSelected((NuSvr) selectedSvmType);
+                            inputUpdater.handleNuSvrSelected((NuSvr) selectedSvmType);
                         } else if (selectedSvmType instanceof EpsilonSvr) {
-                            handleEpsilonSvrSelected((EpsilonSvr) selectedSvmType);
+                            inputUpdater.handleEpsilonSvrSelected((EpsilonSvr) selectedSvmType);
                         } else if (selectedSvmType instanceof OneClassSvm) {
-                            handleOneClassSvmSelected((OneClassSvm) selectedSvmType);
+                            inputUpdater.handleOneClassSvmSelected((OneClassSvm) selectedSvmType);
                         }
 
                     }
@@ -176,9 +182,9 @@ public class SUI extends Application implements Initializable {
     }
 
     private void handlePolynomialKernelSelected(PolynomialKernel kernel) {
-        updateInput(gammaInput, kernel.getGamma());
-        updateInput(coef0Input, kernel.getCoef0());
-        updateInput(degreeInput, kernel.getDegree());
+        inputUpdater.updateInput(gammaInput, kernel.getGamma());
+        inputUpdater.updateInput(coef0Input, kernel.getCoef0());
+        inputUpdater.updateInput(degreeInput, kernel.getDegree());
     }
 
     /**
@@ -209,49 +215,29 @@ public class SUI extends Application implements Initializable {
     }
 
     private void updateOneClassSVM(OneClassSvm svm) {
-        svm.setNu(Double.parseDouble(paramNu.getText())); //TODO: check if correct
+        svm.setNu(Double.parseDouble(paramNu.getText()));
     }
 
     private void updateNUSVRType(NuSvr svm) {
-        svm.setNu(Double.parseDouble(paramNu.getText())); //TODO: check if correct
-        svm.setC(Double.parseDouble(paramC.getText())); //TODO: check if correct
+        svm.setNu(Double.parseDouble(paramNu.getText()));
+        svm.setC(Double.parseDouble(paramC.getText()));
     }
 
     private void updateNUSVCType(NuSvc svm) {
-        svm.setNu(Double.parseDouble(paramNu.getText())); //TODO: check if correct
+        svm.setNu(Double.parseDouble(paramNu.getText()));
     }
 
     private void updateEpsilonSVRType(EpsilonSvr svm) {
-        svm.setC(Double.parseDouble(paramC.getText())); //TODO: Check if correct
-        svm.setP(Double.parseDouble(paramP.getText())); //TODO: Check if correct
+        svm.setC(Double.parseDouble(paramC.getText()));
+        svm.setP(Double.parseDouble(paramP.getText()));
     }
 
     private void updateCSVCType(CSvc svm) {
-        svm.setC(Double.parseDouble(paramC.getText())); //TODO: Check if correct
+        svm.setC(Double.parseDouble(paramC.getText()));
         svm.setNr_weight(Integer.parseInt(paramNrWeight.getText()));
-        svm.setWeight(convertToDoubleArray(paramWeight.getText()));
-        svm.setWeight_label(convertToIntArray(paramWeightLabel.getText()));
-
+        svm.setWeight(StringToArray.convertToDoubleArray(paramWeight.getText()));
+        svm.setWeight_label(StringToArray.convertToIntArray(paramWeightLabel.getText()));
     }
-
-    private int[] convertToIntArray(String text) {
-        String[] stringArray = text.split(",");
-        int[] array = new int[stringArray.length];
-        for (int i = 0; i < stringArray.length; i++) {
-            array[i] = Integer.parseInt(stringArray[i].trim());
-        }
-        return array;
-    }
-
-    private double[] convertToDoubleArray(String text) {
-        String[] stringArray = text.split(",");
-        double[] array = new double[stringArray.length];
-        for (int i = 0; i < stringArray.length; i++) {
-            array[i] = Double.parseDouble(stringArray[i].trim());
-        }
-        return array;
-    }
-
 
     /**
      * Takes data from the text inputs and stores it in a Sigmoid kernel Object
@@ -284,80 +270,21 @@ public class SUI extends Application implements Initializable {
         kernel.setDegree(kernel.getDegree());
     }
 
-    private void handleRadialBasisKernelSelected(RadialBasisKernel kernel) {
-        updateInput(gammaInput, kernel.getGamma());
-    }
-
-    private void handleSigmoidKernelSelected(SigmoidKernel kernel) {
-        updateInput(gammaInput, kernel.getGamma());
-        updateInput(coef0Input, kernel.getCoef0());
-    }
-
-    private void handleCsvcSelected(CSvc svm) {
-        updateInput(paramC, svm.getC());
-        updateInput(paramNrWeight, svm.getNr_weight());
-        updateInput(paramWeight, svm.getWeight());
-        updateInput(paramWeightLabel, svm.getWeight_label());
-    }
-
-    private void handleNuSvcSelected(NuSvc svm) {
-        updateInput(paramNu, svm.getNu());
-    }
-
-    private void handleOneClassSvmSelected(OneClassSvm svm) {
-        updateInput(paramNu, svm.getNu());
-    }
-
-    private void handleNuSvrSelected(NuSvr svm) {
-        updateInput(paramNu, svm.getNu());
-        updateInput(paramC, svm.getC());
-    }
-
-    private void handleEpsilonSvrSelected(EpsilonSvr svm) {
-        updateInput(paramP, svm.getP());
-        updateInput(paramC, svm.getC());
-    }
-
-    private void resetSvmParams() {
-        clearInput(paramC);
-        clearInput(paramNrWeight);
-        clearInput(paramWeight);
-        clearInput(paramWeightLabel);
-        clearInput(paramNu);
-        clearInput(paramP);
-    }
-
-    private void resetKernelParams() {
-        clearInput(gammaInput);
-        clearInput(coef0Input);
-        clearInput(degreeInput);
-    }
-
-    private void clearInput(TextField input) {
-        input.setText("");
-        input.setDisable(true);
-    }
-
-    private void updateInput(TextField input, Object value) {
-        input.setDisable(false);
-        input.setText(String.valueOf(value));
-    }
-
     private void updateTrainingEngine() {
         updateSVMTypeParams();
         updateKernelParams();
-        trainingWrapper.setSelectedKernel(selectedKernel);
-        trainingWrapper.setSelectedSvmType(selectedSvmType);
+        svmTrainer.setSelectedKernel(selectedKernel);
+        svmTrainer.setSelectedSvmType(selectedSvmType);
     }
 
     @FXML
     public void startTraining(final ActionEvent e) {
         updateTrainingEngine();
         try {
-            Model model = trainingWrapper.train();
+            Model model = svmTrainer.train();
             if(model != null) {
                 Logger.getAnonymousLogger().info("trained that shit");
-                predictionWrapper.setModel(model);
+                svmTester.setModel(model);
                 modelLabel.setText(model.toString());
             }
         } catch (IOException e1) {
@@ -370,8 +297,8 @@ public class SUI extends Application implements Initializable {
         final FileChooser fileChooser = new FileChooser();
         File file = fileChooser.showOpenDialog(currentStage);
         if (file != null) {
-            trainingWrapper.setInputFile(file.getAbsolutePath());
-            selectedInputFileLabel.setText(trainingWrapper.getInputFile());
+            svmTrainer.setInputFile(file.getAbsolutePath());
+            selectedInputFileLabel.setText(svmTrainer.getInputFile());
         }
     }
 
@@ -380,11 +307,11 @@ public class SUI extends Application implements Initializable {
         final FileChooser fileChooser = new FileChooser();
         File file = fileChooser.showOpenDialog(currentStage);
         if (file != null) {
-            predictionWrapper.setTestDataFilePath(file.getAbsolutePath());
-            testDataLabel.setText(predictionWrapper.getTestDataFilePath());
+            svmTester.setTestDataFilePath(file.getAbsolutePath());
+            testDataLabel.setText(svmTester.getTestDataFilePath());
 
             predictionOutputFilePath = file.getAbsolutePath().substring(0, file.getAbsolutePath().lastIndexOf(".")) + ".prediction";
-            predictionWrapper.setOutputFilePath(predictionOutputFilePath);
+            svmTester.setOutputFilePath(predictionOutputFilePath);
         }
     }
 
@@ -394,24 +321,23 @@ public class SUI extends Application implements Initializable {
         File file = fileChooser.showOpenDialog(currentStage);
         if (file != null) {
             try {
-                predictionWrapper.loadModel(file.getAbsolutePath());
-                modelLabel.setText(predictionWrapper.getModel().toString());
-                updateModelInfo(predictionWrapper.getModel());
+                svmTester.loadModel(file.getAbsolutePath());
+                modelLabel.setText(svmTester.getModel().toString());
+                updateModelInfo(svmTester.getModel());
             } catch (IOException e1) {
                 Logger.getAnonymousLogger().info("Error while loading file.. " + e1.getMessage());
             }
-            testDataLabel.setText(predictionWrapper.getTestDataFilePath());
+            testDataLabel.setText(svmTester.getTestDataFilePath());
         }
     }
 
     private void updateModelInfo(Model model){
         numberOfClassesLabel.setText(String.valueOf(model.getNr_class()));
-
         updateClassTableWithModel();
     }
 
     private void updateClassTableWithModel(){
-        List<Integer> labelList = intArrayToList(predictionWrapper.getModel().getLabel());
+        List<Integer> labelList = intArrayToList(svmTester.getModel().getLabel());
         ObservableList<Integer> labels = FXCollections.observableArrayList(labelList);
         classTable.setItems(labels);
     }
@@ -427,7 +353,7 @@ public class SUI extends Application implements Initializable {
     @FXML
     public void predict(){
         try {
-            predictionWrapper.predict();
+            svmTester.predict();
             Logger.getAnonymousLogger().info("Predicted that shit, prediction saved in " + predictionOutputFilePath);
         } catch (IOException e) {
             Logger.getAnonymousLogger().info("Error while predicting.." + e.getMessage());
@@ -436,11 +362,55 @@ public class SUI extends Application implements Initializable {
 
     @FXML
     public ObservableList<Kernel> availableKernels() {
-        return FXCollections.observableList(trainingWrapper.getAvailableKernels());
+        return FXCollections.observableList(svmTrainer.getAvailableKernels());
     }
 
     @FXML
     public ObservableList<SvmType> availableSvmTypes() {
-        return FXCollections.observableList(trainingWrapper.getAvailableSvmTypes());
+        return FXCollections.observableList(svmTrainer.getAvailableSvmTypes());
+    }
+
+    public TextField getParamC() {
+        return paramC;
+    }
+
+    public TextField getParamWeight() {
+        return paramWeight;
+    }
+
+    public TextField getParamNrWeight() {
+        return paramNrWeight;
+    }
+
+    public TextField getParamWeightLabel() {
+        return paramWeightLabel;
+    }
+
+    public TextField getParamNu() {
+        return paramNu;
+    }
+
+    public TextField getParamP() {
+        return paramP;
+    }
+
+    public TextField getDegreeInput() {
+        return degreeInput;
+    }
+
+    public TextField getGammaInput() {
+        return gammaInput;
+    }
+
+    public TextField getCoef0Input() {
+        return coef0Input;
+    }
+
+    public void setSvmTrainer(SvmTrainer svmTrainer) {
+        this.svmTrainer = svmTrainer;
+    }
+
+    public void setSvmTester(SvmTester svmTester) {
+        this.svmTester = svmTester;
     }
 }

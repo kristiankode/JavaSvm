@@ -1,4 +1,4 @@
-package no.uib.svm.libsvm.api.options;
+package no.uib.svm.libsvm.api.options.training;
 
 import no.uib.svm.libsvm.api.options.kernel.Kernel;
 import no.uib.svm.libsvm.api.options.svmtype.SvmType;
@@ -11,7 +11,7 @@ import java.util.List;
  * @author kristian
  *         Created 30.05.15.
  */
-public interface Trainer {
+public interface SvmTrainer {
     void loadTrainingDataFromFile() throws IOException;
 
     Model train() throws IOException;

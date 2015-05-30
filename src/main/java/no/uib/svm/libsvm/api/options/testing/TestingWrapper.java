@@ -1,17 +1,17 @@
-package no.uib.svm.libsvm.api.options;
+package no.uib.svm.libsvm.api.options.testing;
 
+import no.uib.svm.libsvm.api.options.logging.Messages;
+import no.uib.svm.libsvm.core.LibSvmTester;
 import no.uib.svm.libsvm.core.libsvm.Model;
+import no.uib.svm.libsvm.core.libsvm.PrintInterface;
 import no.uib.svm.libsvm.core.libsvm.svm;
-import no.uib.svm.libsvm.core.libsvm.SvmModel;
-import no.uib.svm.libsvm.core.SvmTester;
 
 import java.io.*;
-import java.util.logging.Logger;
 
 /**
  * Class for testing the performance of a model.
  */
-public class TestingWrapper {
+public class TestingWrapper implements SvmTester {
 
     private String
             modelFilePath,
@@ -21,23 +21,27 @@ public class TestingWrapper {
 
     private Boolean predictProbability = false;
 
+    private PrintInterface msg = new Messages();
+
+    @Override
     public void loadModel(String filePath) throws IOException {
         model = svm.svm_load_model(filePath);
     }
 
+    @Override
     public void predict() throws IOException {
         BufferedReader inputReader = getTestDataReader();
 
-        SvmTester.predict(
+        LibSvmTester.predict(
                 inputReader, getOutputStream(), this.model, booleanToInt(predictProbability));
     }
 
-    public BufferedReader getTestDataReader() {
+    private BufferedReader getTestDataReader() {
         if (testDataFilePath != null && !testDataFilePath.isEmpty()) {
             try {
                 return new BufferedReader(new FileReader(testDataFilePath));
             } catch (FileNotFoundException e) {
-                Logger.getAnonymousLogger().info("couldnt find specified file.." + testDataFilePath);
+                msg.print("couldnt find specified file.." + testDataFilePath);
             }
         }
         return null;
@@ -52,42 +56,52 @@ public class TestingWrapper {
         return bool ? 1 : 0;
     }
 
+    @Override
     public String getOutputFilePath() {
         return outputFilePath;
     }
 
+    @Override
     public void setOutputFilePath(String outputFilePath) {
         this.outputFilePath = outputFilePath;
     }
 
+    @Override
     public Model getModel() {
         return model;
     }
 
+    @Override
     public void setModel(Model model) {
         this.model = model;
     }
 
+    @Override
     public String getModelFilePath() {
         return modelFilePath;
     }
 
+    @Override
     public void setModelFilePath(String modelFilePath) {
         this.modelFilePath = modelFilePath;
     }
 
+    @Override
     public void setTestDataFilePath(String filePath) {
         this.testDataFilePath = filePath;
     }
 
+    @Override
     public String getTestDataFilePath() {
         return testDataFilePath;
     }
 
+    @Override
     public Boolean getPredictProbability() {
         return predictProbability;
     }
 
+    @Override
     public void setPredictProbability(Boolean predictProbability) {
         this.predictProbability = predictProbability;
     }
