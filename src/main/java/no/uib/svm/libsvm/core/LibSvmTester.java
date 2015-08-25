@@ -141,7 +141,8 @@ public class LibSvmTester {
         if (i >= argv.length - 2)
             exit_with_help();
         try {
-            BufferedReader input = new BufferedReader(new FileReader(argv[i]));
+            Reader reader = new InputStreamReader(new FileInputStream(argv[i]), "Unicode");
+            BufferedReader input = new BufferedReader(reader);
             DataOutputStream output = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(argv[i + 2])));
             SvmModel model = svm.svm_load_model(argv[i + 1]);
             if (model == null) {

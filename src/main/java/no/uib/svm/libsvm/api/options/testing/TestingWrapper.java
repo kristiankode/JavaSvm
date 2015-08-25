@@ -39,9 +39,12 @@ public class TestingWrapper implements SvmTester {
     private BufferedReader getTestDataReader() {
         if (testDataFilePath != null && !testDataFilePath.isEmpty()) {
             try {
-                return new BufferedReader(new FileReader(testDataFilePath));
+                Reader reader = new InputStreamReader(new FileInputStream(testDataFilePath), "Unicode");
+                return new BufferedReader(reader);
             } catch (FileNotFoundException e) {
                 msg.print("couldnt find specified file.." + testDataFilePath);
+            } catch (UnsupportedEncodingException e) {
+                msg.print("Unsupported encoding.. " + e.getMessage());
             }
         }
         return null;

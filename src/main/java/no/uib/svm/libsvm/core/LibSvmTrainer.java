@@ -3,9 +3,7 @@ package no.uib.svm.libsvm.core;
 import no.uib.svm.libsvm.api.options.logging.Messages;
 import no.uib.svm.libsvm.core.libsvm.*;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.StringTokenizer;
 import java.util.Vector;
 
@@ -247,7 +245,8 @@ public class LibSvmTrainer {
      * @throws IOException
      */
     public void read_problem() throws IOException {
-        BufferedReader fp = new BufferedReader(new FileReader(input_file_name));
+        Reader reader = new InputStreamReader(new FileInputStream(input_file_name), "Unicode");
+        BufferedReader fp = new BufferedReader(reader);
         Vector<Double> vy = new Vector<Double>();
         Vector<Node[]> vx = new Vector<Node[]>();
         int max_index = 0;

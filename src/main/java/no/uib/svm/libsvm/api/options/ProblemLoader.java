@@ -4,9 +4,7 @@ import no.uib.svm.libsvm.core.libsvm.Node;
 import no.uib.svm.libsvm.core.libsvm.Problem;
 import no.uib.svm.libsvm.core.libsvm.SvmParameter;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.StringTokenizer;
 import java.util.Vector;
 
@@ -24,7 +22,8 @@ public class ProblemLoader {
      * @param param
      */
     public static Problem loadProblemFromFile(String fileName, SvmParameter param) throws IOException {
-        BufferedReader fp = new BufferedReader(new FileReader(fileName));
+        Reader reader = new InputStreamReader(new FileInputStream(fileName), "Unicode");
+        BufferedReader fp = new BufferedReader(reader);
         Vector<Double> vy = new Vector<Double>();
         Vector<Node[]> vx = new Vector<Node[]>();
         int max_index = 0;
