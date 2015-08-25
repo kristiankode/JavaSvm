@@ -21,9 +21,10 @@ public class CsvSVMLight {
     static final String INDEX_GENETIC = "ACGT";
 
     private static final String
-            KRISTIAN_GENDATA = "/Users/kristianhestetun/Downloads/Genbank_sample.csv",
-            KRISTIAN_TRAINING_SET = "output-train.t",
-            KRISTIAN_TEST_SET = "output-test";
+            KRISTIAN_GENDATA_TRAINING = "/Users/kristianhestetun/Downloads/Genbank_sample.csv",
+            KRISTIAN_GENDATA_VALIDATION = "/Users/kristianhestetun/Utvikling/MachineLearning/jLibSvm/Genbank_different.csv",
+            KRISTIAN_TRAINING_SET = "dna.training",
+            KRISTIAN_VALIDATION_SET = "dna.validation";
     private static final String
             GENDATA_File = "D://Output/GenBank/Genbank_sample.csv",
             GENDATA_TRAINING = "D://Output/Training/svm_train.t",
@@ -31,6 +32,8 @@ public class CsvSVMLight {
             GENDATA_TEST_DATA = "D://Output/Training/svm_test";
     public static final int NUMBER_OF_ATTRIBUTES = 600;
     public static final String CHARSET_NAME = "Unicode";
+    public static final String KEY_VALUE_SEPARATOR = ":";
+    public static final String ATTR_SEPARATOR = " ";
 
 
     public static void main(String[] args) {
@@ -43,10 +46,9 @@ public class CsvSVMLight {
      */
     private void run() {
         /** Reade_file param 1 and creating_training_data param 2 **/
-        writeToFile(GENDATA_File, GENDATA_TRAINING);
-        writeToFile(GENDATA_TEST_FILE, GENDATA_TEST_DATA);
+        writeToFile(KRISTIAN_GENDATA_TRAINING, KRISTIAN_TRAINING_SET);
+        writeToFile(KRISTIAN_GENDATA_VALIDATION, KRISTIAN_VALIDATION_SET);
     }
-
 
     /**
      * Creating training data and test data
@@ -115,17 +117,24 @@ public class CsvSVMLight {
 
     private List<String> createDnaVector(String ntSequence) {
 
-        List<String> dna_vector = new ArrayList<String>(ntSequence.length());
+        List<String> dnaVector = new ArrayList<>(ntSequence.length());
         for (int i = 0; i < NUMBER_OF_ATTRIBUTES; i++) {
-            StringBuilder string_builder = new StringBuilder();
-            if (i >= ntSequence.length()) {
-                string_builder.append(0).append(":").append(0).append(" ");
-            } else {
-                string_builder.append(i + 1).append(":").append(findNumericValue(ntSequence.charAt(i))).append(" ");
-            }
-            dna_vector.add(string_builder.toString());
+            dnaVector.add(buildAttributeString(ntSequence, i));
         }
-        return dna_vector;
+        return dnaVector;
+    }
+
+    private String buildAttributeString(String ntSequence, int i) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(i + 1).append(KEY_VALUE_SEPARATOR);
+
+        if (i >= ntSequence.length()) {
+            sb.append(0);
+        } else {
+            sb.append(findNumericValue(ntSequence.charAt(i)));
+        }
+        sb.append(ATTR_SEPARATOR);
+        return sb.toString();
     }
 
     private int findNumericValue(char c) {
