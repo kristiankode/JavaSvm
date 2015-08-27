@@ -48,9 +48,6 @@ public class CsvSVMLight {
      */
     private void run() {
 
-        DnaToNumeric.generateUniqueGeneticListOfFour();
-        DnaToNumeric.generateUniqueGeneticListOfThree();
-
         /** Reade_file param 1 and creating_training_data param 2 **/
         writeToFile(KRISTIAN_GENDATA_TRAINING, KRISTIAN_TRAINING_SET);
 
@@ -67,12 +64,12 @@ public class CsvSVMLight {
         try {
             /** File input **/
             Reader reader = new InputStreamReader(
-                    new FileInputStream(inputFilePath), settings.getInputCharset());
+                    new FileInputStream(inputFilePath), settings.getCsvCharset());
             BufferedReader buffered_reader = new BufferedReader(reader);
 
             BufferedWriter bufferedWriter =
                     new BufferedWriter(new OutputStreamWriter(
-                            new FileOutputStream(outputFilePath), settings.getOutputCharset()));
+                            new FileOutputStream(outputFilePath), settings.getSvmCharset()));
 
             String inputLine = "";
             /** Looping through the content of a file **/

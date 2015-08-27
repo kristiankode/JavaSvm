@@ -249,7 +249,7 @@ public class LibSvmTrainer {
      */
     public void read_problem() throws IOException {
         Reader reader = new InputStreamReader(
-                new FileInputStream(input_file_name),settings.getOutputCharset());
+                new FileInputStream(input_file_name),settings.getSvmCharset());
         BufferedReader fp = new BufferedReader(reader);
         Vector<Double> vy = new Vector<Double>();
         Vector<Node[]> vx = new Vector<Node[]>();

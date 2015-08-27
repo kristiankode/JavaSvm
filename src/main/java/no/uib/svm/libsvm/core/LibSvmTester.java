@@ -148,7 +148,7 @@ public class LibSvmTester {
             exit_with_help();
         try {
             Reader reader = new InputStreamReader(
-                    new FileInputStream(argv[i]), settings.getOutputCharset());
+                    new FileInputStream(argv[i]), settings.getSvmCharset());
             BufferedReader input = new BufferedReader(reader);
             DataOutputStream output = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(argv[i + 2])));
             SvmModel model = svm.svm_load_model(argv[i + 1]);

@@ -5,9 +5,9 @@ package no.uib.svm.libsvm.core.settings;
  *         Created 26.08.2015.
  */
 public interface Settings {
-    String getInputCharset();
+    String getCsvCharset();
 
     int getWindowSize();
 
-    String getOutputCharset();
+    String getSvmCharset();
 }

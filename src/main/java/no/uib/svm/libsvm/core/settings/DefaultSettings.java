@@ -7,14 +7,14 @@ package no.uib.svm.libsvm.core.settings;
 public class DefaultSettings implements Settings {
 
     private static final String
-            INPUT_CHARSET = "Unicode",
-            OUTPUT_CHARSET = "UTF-8";
+            CSV_CHARSET = "Unicode",
+            SVM_CHARSET = "UTF-8";
 
     private static final int WINDOW_SIZE = 1;
 
     @Override
-    public String getInputCharset(){
-        return INPUT_CHARSET;
+    public String getCsvCharset(){
+        return CSV_CHARSET;
     }
 
     @Override
@@ -23,7 +23,7 @@ public class DefaultSettings implements Settings {
     }
 
     @Override
-    public String getOutputCharset(){
-        return OUTPUT_CHARSET;
+    public String getSvmCharset(){
+        return SVM_CHARSET;
     }
 }

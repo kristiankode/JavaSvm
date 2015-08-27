@@ -5,6 +5,8 @@ import no.uib.svm.libsvm.core.LibSvmTester;
 import no.uib.svm.libsvm.core.libsvm.Model;
 import no.uib.svm.libsvm.core.libsvm.PrintInterface;
 import no.uib.svm.libsvm.core.libsvm.svm;
+import no.uib.svm.libsvm.core.settings.Settings;
+import no.uib.svm.libsvm.core.settings.SettingsFactory;
 
 import java.io.*;
 
@@ -13,7 +15,7 @@ import java.io.*;
  */
 public class TestingWrapper implements SvmTester {
 
-    public static final String INPUT_CHARSET = "Unicode";
+    private final Settings settings = SettingsFactory.getActiveSettings();
     private String
             modelFilePath,
             testDataFilePath,
@@ -40,7 +42,8 @@ public class TestingWrapper implements SvmTester {
     private BufferedReader getTestDataReader() {
         if (testDataFilePath != null && !testDataFilePath.isEmpty()) {
             try {
-                Reader reader = new InputStreamReader(new FileInputStream(testDataFilePath), INPUT_CHARSET);
+                Reader reader = new InputStreamReader(
+                        new FileInputStream(testDataFilePath), settings.getSvmCharset());
                 return new BufferedReader(reader);
             } catch (FileNotFoundException e) {
                 msg.print("couldnt find specified file.." + testDataFilePath);

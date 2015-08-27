@@ -39,7 +39,7 @@ class DataScaler {
     private BufferedReader rewind(BufferedReader fp, String filename) throws IOException {
         fp.close();
         Reader reader = new InputStreamReader(
-                new FileInputStream(filename), settings.getOutputCharset());
+                new FileInputStream(filename), settings.getSvmCharset());
         return new BufferedReader(reader);
     }
 
@@ -133,7 +133,7 @@ class DataScaler {
         data_filename = argv[i];
         try {
             Reader reader = new InputStreamReader(
-                    new FileInputStream(data_filename), settings.getOutputCharset());
+                    new FileInputStream(data_filename), settings.getSvmCharset());
             fp = new BufferedReader(reader);
         } catch (Exception e) {
             System.err.println("can't open file " + data_filename);

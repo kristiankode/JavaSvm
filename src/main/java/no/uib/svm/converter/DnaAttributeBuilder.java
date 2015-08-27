@@ -6,11 +6,9 @@ import no.uib.svm.libsvm.core.settings.SettingsFactory;
 import java.util.ArrayList;
 import java.util.List;
 
-import static no.uib.svm.converter.DnaToNumeric.numericValueOfSingle;
-import static no.uib.svm.converter.DnaToNumeric.numericValueOfSubstring;
-
 public class DnaAttributeBuilder {
     public static final Settings settings = SettingsFactory.getActiveSettings();
+    private final DnaToNumeric dnaToNumeric = new DnaToNumeric();
 
     public List<String> createDnaVector(String ntSequence) {
 
@@ -41,11 +39,9 @@ public class DnaAttributeBuilder {
     int getAttributeValue(String ntSequence, int i) {
         if (i >= ntSequence.length() - settings.getWindowSize()) {
             return 0;
-        } else if (settings.getWindowSize() == 1) {
-            return numericValueOfSingle(ntSequence.charAt(i));
         } else if (i + settings.getWindowSize() < ntSequence.length()) {
             String substring = ntSequence.substring(i, i + settings.getWindowSize());
-            int value = numericValueOfSubstring(substring);
+            int value = dnaToNumeric.valueOf(substring);
             if (value == -1) {
                 System.out.println("Unable to find index for '" + substring + "'");
             }

@@ -1,27 +1,54 @@
 package no.uib.svm.converter;
 
+import no.uib.svm.libsvm.core.settings.SettingsFactory;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 public class DnaToNumeric {
-    private final CsvSVMLight csvSVMLight;
-    static final String INDEX_GENETIC = "ACGT";
-    static final List<String>
-            INDEX_GENETICTHREE = new ArrayList<String>(),
-            INDEX_GENETICTWO = Arrays.asList("AA", "TT", "GG", "CC", "AT", "AG", "AC", "TA", "GA", "CA", "TG", "TC", "CT", "GT", "GC", "CG"),
-            INDEX_GENETICFOUR = new ArrayList<String>();
+    static final String INDEX_GENETIC = "TGCARNMKYSWDH";
+    private List<String> dnaValues;
 
-    public DnaToNumeric(CsvSVMLight csvSVMLight) {
-        this.csvSVMLight = csvSVMLight;
+    public DnaToNumeric() {
+        generateAppropriateValues();
     }
 
-    static void generateUniqueGeneticListOfThree() {
+    private void generateAppropriateValues() {
+        switch (SettingsFactory.getActiveSettings().getWindowSize()) {
+            case 4:
+                dnaValues = generateUniqueGeneticListOfFour();
+                break;
+            case 3:
+                dnaValues = generateUniqueGeneticListOfThree();
+                break;
+            case 2:
+                dnaValues = generateUniqueGeneticListOfTwo();
+                break;
+            default:
+                // do nothing
+        }
+    }
+
+    public int valueOf(String str) {
+        int length = str.length();
+
+        if(length > 1) {
+            return dnaValues.indexOf(str);
+        } else if (length == 1){
+            return INDEX_GENETIC.indexOf(str.charAt(0));
+        } else {
+            return 0;
+        }
+    }
+
+    List<String> generateUniqueGeneticListOfThree() {
+        List<String> tripleValues = new ArrayList<>();
         for (int i = 0; i < INDEX_GENETIC.length(); i++) {
             for (int j = 0; j < INDEX_GENETIC.length(); j++) {
                 for (int k = 0; k < INDEX_GENETIC.length(); k++) {
                     StringBuilder sb = new StringBuilder();
-                    INDEX_GENETICTHREE.add(
+                    tripleValues.add(
                             sb
                                     .append(INDEX_GENETIC.charAt(i))
                                     .append(INDEX_GENETIC.charAt(j))
@@ -31,43 +58,44 @@ public class DnaToNumeric {
             }
         }
 
-        printList(INDEX_GENETICTHREE);
+        printList(tripleValues);
+        return tripleValues;
     }
 
-    public static int numericValueOfSubstring(String str) {
-        int length = str.length();
-        if (length == 4) {
-            return INDEX_GENETICFOUR.indexOf(str);
-        } else if (length == 3) {
-            return INDEX_GENETICTHREE.indexOf(str);
-        } else { // length == 2
-            return INDEX_GENETICTWO.indexOf(str);
-        }
-    }
-
-
-    public static void generateUniqueGeneticListOfFour() {
+    List<String> generateUniqueGeneticListOfFour() {
+        List<String> quadValues = new ArrayList<>();
         for (int i = 0; i < DnaToNumeric.INDEX_GENETIC.length(); i++) {
             for (int j = 0; j < DnaToNumeric.INDEX_GENETIC.length(); j++) {
                 for (int k = 0; k < DnaToNumeric.INDEX_GENETIC.length(); k++) {
                     for (int l = 0; l < DnaToNumeric.INDEX_GENETIC.length(); l++) {
                         StringBuilder sb = new StringBuilder();
-                        DnaToNumeric.INDEX_GENETICFOUR.add(sb.append(DnaToNumeric.INDEX_GENETIC.charAt(i)).append(DnaToNumeric.INDEX_GENETIC.charAt(j)).append(DnaToNumeric.INDEX_GENETIC.charAt(k)).append(DnaToNumeric.INDEX_GENETIC.charAt(l)).toString());
+                        quadValues.add(sb.append(
+                                INDEX_GENETIC.charAt(i))
+                                .append(INDEX_GENETIC.charAt(j))
+                                .append(INDEX_GENETIC.charAt(k))
+                                .append(INDEX_GENETIC.charAt(l))
+                                .toString());
                     }
                 }
             }
         }
+        return quadValues;
     }
-
-    public static int numericValueOfSingle(char c) {
-        return INDEX_GENETIC.indexOf(c) + 1;
-    }
-
 
     static void printList(List<String> list) {
         System.out.println("printing list with " + list.size() + " elements");
-        for(String s : list) {
-            System.out.println(s);
+        list.forEach(System.out::println);
+    }
+
+    List<String> generateUniqueGeneticListOfTwo() {
+        List<String> doubleValues = new ArrayList<>();
+        for (int i = 0; i < INDEX_GENETIC.length(); i++) {
+            for (int j = 0; j < INDEX_GENETIC.length(); j++) {
+                StringBuilder sb = new StringBuilder();
+                doubleValues.add(sb.append(INDEX_GENETIC.charAt(i))
+                        .append(INDEX_GENETIC.charAt(j)).toString());
+            }
         }
+        return doubleValues;
     }
 }
