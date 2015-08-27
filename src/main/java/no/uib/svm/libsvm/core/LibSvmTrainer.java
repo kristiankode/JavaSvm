@@ -2,12 +2,15 @@ package no.uib.svm.libsvm.core;
 
 import no.uib.svm.libsvm.api.options.logging.Messages;
 import no.uib.svm.libsvm.core.libsvm.*;
+import no.uib.svm.libsvm.core.settings.Settings;
+import no.uib.svm.libsvm.core.settings.SettingsFactory;
 
 import java.io.*;
 import java.util.StringTokenizer;
 import java.util.Vector;
 
 public class LibSvmTrainer {
+    private static final Settings settings = SettingsFactory.getActiveSettings();
     private SvmParameter param;        // set by parse_command_line
     private Problem prob;        // set by read_problem
     private SvmModel model;
@@ -245,7 +248,8 @@ public class LibSvmTrainer {
      * @throws IOException
      */
     public void read_problem() throws IOException {
-        Reader reader = new InputStreamReader(new FileInputStream(input_file_name), "Unicode");
+        Reader reader = new InputStreamReader(
+                new FileInputStream(input_file_name),settings.getOutputCharset());
         BufferedReader fp = new BufferedReader(reader);
         Vector<Double> vy = new Vector<Double>();
         Vector<Node[]> vx = new Vector<Node[]>();

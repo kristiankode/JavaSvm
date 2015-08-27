@@ -1,6 +1,8 @@
 package no.uib.svm.libsvm.core;
 
 import no.uib.svm.libsvm.core.libsvm.*;
+import no.uib.svm.libsvm.core.settings.Settings;
+import no.uib.svm.libsvm.core.settings.SettingsFactory;
 
 import java.io.*;
 import java.util.StringTokenizer;
@@ -9,6 +11,9 @@ import java.util.StringTokenizer;
  * Runs predictions on test data. Requires a trained model.
  */
 public class LibSvmTester {
+
+    private static final Settings settings = SettingsFactory.getActiveSettings();
+
     private static PrintInterface svm_print_null = new PrintInterface() {
         public void print(String s) {
         }
@@ -34,7 +39,8 @@ public class LibSvmTester {
         return Integer.parseInt(s);
     }
 
-    public static void predict(BufferedReader input, DataOutputStream output, Model model, int predict_probability) throws IOException {
+    public static void predict(BufferedReader input, DataOutputStream output, Model model, int predict_probability)
+            throws IOException {
         int correct = 0;
         int total = 0;
         double error = 0;
@@ -141,7 +147,8 @@ public class LibSvmTester {
         if (i >= argv.length - 2)
             exit_with_help();
         try {
-            Reader reader = new InputStreamReader(new FileInputStream(argv[i]), "Unicode");
+            Reader reader = new InputStreamReader(
+                    new FileInputStream(argv[i]), settings.getOutputCharset());
             BufferedReader input = new BufferedReader(reader);
             DataOutputStream output = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(argv[i + 2])));
             SvmModel model = svm.svm_load_model(argv[i + 1]);

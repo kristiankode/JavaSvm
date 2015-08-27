@@ -13,6 +13,7 @@ import java.io.*;
  */
 public class TestingWrapper implements SvmTester {
 
+    public static final String INPUT_CHARSET = "Unicode";
     private String
             modelFilePath,
             testDataFilePath,
@@ -39,7 +40,7 @@ public class TestingWrapper implements SvmTester {
     private BufferedReader getTestDataReader() {
         if (testDataFilePath != null && !testDataFilePath.isEmpty()) {
             try {
-                Reader reader = new InputStreamReader(new FileInputStream(testDataFilePath), "Unicode");
+                Reader reader = new InputStreamReader(new FileInputStream(testDataFilePath), INPUT_CHARSET);
                 return new BufferedReader(reader);
             } catch (FileNotFoundException e) {
                 msg.print("couldnt find specified file.." + testDataFilePath);
