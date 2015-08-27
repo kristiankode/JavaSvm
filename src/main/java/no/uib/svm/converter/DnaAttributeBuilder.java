@@ -10,13 +10,12 @@ import static no.uib.svm.converter.DnaToNumeric.numericValueOfSingle;
 import static no.uib.svm.converter.DnaToNumeric.numericValueOfSubstring;
 
 public class DnaAttributeBuilder {
-    public static final int NUMBER_OF_ATTRIBUTES = 1200;
     public static final Settings settings = SettingsFactory.getActiveSettings();
 
     public List<String> createDnaVector(String ntSequence) {
 
         List<String> dnaVector = new ArrayList<>(ntSequence.length());
-        for (int i = 0; i < NUMBER_OF_ATTRIBUTES; i++) {
+        for (int i = 0; i < ntSequence.length(); i++) {
             dnaVector.add(buildAttributeString(ntSequence, i));
         }
         return dnaVector;
@@ -44,10 +43,10 @@ public class DnaAttributeBuilder {
             return 0;
         } else if (settings.getWindowSize() == 1) {
             return numericValueOfSingle(ntSequence.charAt(i));
-        } else if(i + settings.getWindowSize() < ntSequence.length()) {
+        } else if (i + settings.getWindowSize() < ntSequence.length()) {
             String substring = ntSequence.substring(i, i + settings.getWindowSize());
             int value = numericValueOfSubstring(substring);
-            if(value == -1) {
+            if (value == -1) {
                 System.out.println("Unable to find index for '" + substring + "'");
             }
             return value;
