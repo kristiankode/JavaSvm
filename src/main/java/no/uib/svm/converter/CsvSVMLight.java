@@ -1,7 +1,10 @@
 package no.uib.svm.converter;
 
+import com.sun.media.sound.InvalidDataException;
+import no.uib.svm.libsvm.core.settings.Settings;
+import no.uib.svm.libsvm.core.settings.SettingsFactory;
+
 import java.io.*;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -18,7 +21,6 @@ import java.util.List;
  * Should also support 2 : Virus
  */
 public class CsvSVMLight {
-    static final String INDEX_GENETIC = "ACGT";
 
     private static final String
             KRISTIAN_GENDATA_TRAINING = "/Users/kristianhestetun/Downloads/Genbank_sample.csv",
@@ -30,11 +32,11 @@ public class CsvSVMLight {
             GENDATA_TRAINING = "D://Output/Training/svm_train.t",
             GENDATA_TEST_FILE = "D://Output/GenBank/Genbank_different.csv",
             GENDATA_TEST_DATA = "D://Output/Training/svm_test";
-    public static final int NUMBER_OF_ATTRIBUTES = 600;
-    public static final String CHARSET_NAME = "Unicode";
-    public static final String KEY_VALUE_SEPARATOR = ":";
-    public static final String ATTR_SEPARATOR = " ";
-
+    private static final Settings settings = SettingsFactory.getActiveSettings();
+    public static final String
+            KEY_VALUE_SEPARATOR = ":",
+            ATTR_SEPARATOR = " ",
+            LINE_SEPARATOR = "\n";
 
     public static void main(String[] args) {
         CsvSVMLight csvSVMLight = new CsvSVMLight();
@@ -45,9 +47,14 @@ public class CsvSVMLight {
      * Setting up input_file_destination
      */
     private void run() {
+
+        DnaToNumeric.generateUniqueGeneticListOfFour();
+        DnaToNumeric.generateUniqueGeneticListOfThree();
+
         /** Reade_file param 1 and creating_training_data param 2 **/
         writeToFile(KRISTIAN_GENDATA_TRAINING, KRISTIAN_TRAINING_SET);
-        writeToFile(KRISTIAN_GENDATA_VALIDATION, KRISTIAN_VALIDATION_SET);
+
+        System.out.println("File saved as " + KRISTIAN_TRAINING_SET);
     }
 
     /**
@@ -57,23 +64,15 @@ public class CsvSVMLight {
      * @param outputFilePath
      */
     private void writeToFile(String inputFilePath, String outputFilePath) {
-
-        /**File output**/
-        File outputFile = new File(outputFilePath);
         try {
-            if (!outputFile.exists()) {
-                outputFile.createNewFile();
-            }
-
             /** File input **/
-            Reader reader = new InputStreamReader(new FileInputStream(inputFilePath), CHARSET_NAME);
+            Reader reader = new InputStreamReader(
+                    new FileInputStream(inputFilePath), settings.getInputCharset());
             BufferedReader buffered_reader = new BufferedReader(reader);
 
-            if (!outputFile.exists()) {
-                outputFile.createNewFile();
-            }
             BufferedWriter bufferedWriter =
-                    new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outputFilePath), CHARSET_NAME));
+                    new BufferedWriter(new OutputStreamWriter(
+                            new FileOutputStream(outputFilePath), settings.getOutputCharset()));
 
             String inputLine = "";
             /** Looping through the content of a file **/
@@ -83,7 +82,7 @@ public class CsvSVMLight {
                 if (inputData.length > 1) {
                     String ntSequence = inputData[0];
                     String libraryType = inputData[1];
-                    convertLine(ntSequence.trim(), libraryType.trim(), bufferedWriter);
+                    writeLine(ntSequence.trim(), libraryType.trim(), bufferedWriter);
                 }
             }
             bufferedWriter.flush();
@@ -97,48 +96,23 @@ public class CsvSVMLight {
     }
 
 
-    private void convertLine(String ntSequence, String libraryType, BufferedWriter bufferedWriter)
+    private void writeLine(String ntSequence, String libraryType, BufferedWriter bufferedWriter)
             throws IOException {
-        int classification;
+        String classification;
         if (libraryType.equalsIgnoreCase("Bacteria")) {
-            classification = 1;
+            classification = "+1";
         } else if (libraryType.equalsIgnoreCase("Fungi")) {
-            classification = 2;
+            classification = "-1";
         } else {
-            classification = -1;
+            throw new InvalidDataException("Unknown library type: " + libraryType);
         }
-        List<String> dna_vector = createDnaVector(ntSequence);
+
+        DnaAttributeBuilder dnaAttributeBuilder = new DnaAttributeBuilder();
+        List<String> dnaVector = dnaAttributeBuilder.createDnaVector(ntSequence);
         StringBuilder attributes = new StringBuilder();
-        for (String dna : dna_vector) {
-            attributes.append(dna).append(" ");
+        for (String dna : dnaVector) {
+            attributes.append(dna);
         }
-        bufferedWriter.write(classification + " " + attributes.toString() + "\n");
+        bufferedWriter.write(classification + ATTR_SEPARATOR + attributes.toString() + LINE_SEPARATOR);
     }
-
-    private List<String> createDnaVector(String ntSequence) {
-
-        List<String> dnaVector = new ArrayList<>(ntSequence.length());
-        for (int i = 0; i < NUMBER_OF_ATTRIBUTES; i++) {
-            dnaVector.add(buildAttributeString(ntSequence, i));
-        }
-        return dnaVector;
-    }
-
-    private String buildAttributeString(String ntSequence, int i) {
-        StringBuilder sb = new StringBuilder();
-        sb.append(i + 1).append(KEY_VALUE_SEPARATOR);
-
-        if (i >= ntSequence.length()) {
-            sb.append(0);
-        } else {
-            sb.append(findNumericValue(ntSequence.charAt(i)));
-        }
-        sb.append(ATTR_SEPARATOR);
-        return sb.toString();
-    }
-
-    private int findNumericValue(char c) {
-        return INDEX_GENETIC.indexOf(c) + 1;
-    }
-
 }
