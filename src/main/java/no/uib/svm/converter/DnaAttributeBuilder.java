@@ -17,14 +17,16 @@ public class DnaAttributeBuilder {
     private static final DnaToNumeric dnaToNumeric = new DnaToNumeric(settings.getWindowSize());
     long counter = 0; // number of processed entries
     final long startupTime = currentTimeMillis();
+    int longestDnaSequenceLength = 0;
 
     // debug messages
     final static String
-            CONVERT_MSG = "Converted {} dna sequences in {} millis",
+            CONVERT_MSG = "Converted {} dna sequences in {} millis," +
+            "longest sequence: {}",
             UNKNOWN_SUBSTRING = "Unable to find index for {}";
 
     public List<String> createDnaVector(String ntSequence) {
-
+        saveMax(ntSequence.length());
         List<String> dnaVector = new ArrayList<>(ntSequence.length());
         for (int i = 0; i < ntSequence.length(); i++) {
             dnaVector.add(buildAttributeString(ntSequence, i));
@@ -34,9 +36,19 @@ public class DnaAttributeBuilder {
         return dnaVector;
     }
 
+    void saveMax(int length) {
+        if(length > longestDnaSequenceLength) {
+            longestDnaSequenceLength = length;
+        }
+    }
+
     void printInfo(){
-        if(counter % 1000 == 0) {
-            log.debug(CONVERT_MSG, counter, currentTimeMillis() - startupTime);
+        if(counter % 500 == 0) {
+            log.debug(
+                    CONVERT_MSG,
+                    counter,
+                    currentTimeMillis() - startupTime,
+                    longestDnaSequenceLength);
         }
     }
 
