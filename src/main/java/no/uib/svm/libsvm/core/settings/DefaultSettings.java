@@ -10,7 +10,7 @@ public class DefaultSettings implements Settings {
             CSV_CHARSET = "Unicode",
             SVM_CHARSET = "UTF-8";
 
-    private static final int WINDOW_SIZE = 1;
+    private static final int WINDOW_SIZE = 3;
 
     @Override
     public String getCsvCharset(){

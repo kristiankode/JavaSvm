@@ -1,21 +1,21 @@
 package no.uib.svm.converter;
 
-import no.uib.svm.libsvm.core.settings.SettingsFactory;
-
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class DnaToNumeric {
     static final String INDEX_GENETIC = "TGCARNMKYSWDH";
     private List<String> dnaValues;
 
-    public DnaToNumeric() {
+    private final int windowSize;
+
+    public DnaToNumeric(int windowSize) {
+        this.windowSize = windowSize;
         generateAppropriateValues();
     }
 
     private void generateAppropriateValues() {
-        switch (SettingsFactory.getActiveSettings().getWindowSize()) {
+        switch (windowSize) {
             case 4:
                 dnaValues = generateUniqueGeneticListOfFour();
                 break;

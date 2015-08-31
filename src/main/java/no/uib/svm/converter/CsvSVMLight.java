@@ -23,7 +23,7 @@ import java.util.List;
 public class CsvSVMLight {
 
     private static final String
-            KRISTIAN_GENDATA_TRAINING = "/Users/kristianhestetun/Downloads/Genbank_sample.csv",
+            KRISTIAN_GENDATA_TRAINING = "/Users/kristianhestetun/Utvikling/MachineLearning/JavaSVM/200k.csv",
             KRISTIAN_GENDATA_VALIDATION = "/Users/kristianhestetun/Utvikling/MachineLearning/jLibSvm/Genbank_different.csv",
             KRISTIAN_TRAINING_SET = "dna.training",
             KRISTIAN_VALIDATION_SET = "dna.validation";
@@ -34,7 +34,18 @@ public class CsvSVMLight {
             GENDATA_TEST_DATA = "D://Output/Training/svm_test";
     private static final Settings settings = SettingsFactory.getActiveSettings();
     public static final String
+            BACTERIA_LIBRARY = "Bacteria",
+            FUNGI_LIBRARY = "Fungi",
+            FUNGI_CODE = "-1",
+            BACTERIA_CODE = "+1";
+
+    final DnaAttributeBuilder attributeBuilder = new DnaAttributeBuilder();
+    public static final String
+            BLANK_SPACE_BABY = " ",
+            COMMA_CHAMELEON = ",",
+            EMPTY_STRING = "",
             KEY_VALUE_SEPARATOR = ":",
+            TARGET = " ",
             ATTR_SEPARATOR = " ",
             LINE_SEPARATOR = "\n";
 
@@ -74,8 +85,8 @@ public class CsvSVMLight {
             String inputLine = "";
             /** Looping through the content of a file **/
             while ((inputLine = buffered_reader.readLine()) != null) {
-                inputLine = inputLine.replace(" ", "");
-                String[] inputData = inputLine.split(",");
+                inputLine = inputLine.replace(BLANK_SPACE_BABY, EMPTY_STRING);
+                String[] inputData = inputLine.split(COMMA_CHAMELEON);
                 if (inputData.length > 1) {
                     String ntSequence = inputData[0];
                     String libraryType = inputData[1];
@@ -96,16 +107,15 @@ public class CsvSVMLight {
     private void writeLine(String ntSequence, String libraryType, BufferedWriter bufferedWriter)
             throws IOException {
         String classification;
-        if (libraryType.equalsIgnoreCase("Bacteria")) {
-            classification = "+1";
-        } else if (libraryType.equalsIgnoreCase("Fungi")) {
-            classification = "-1";
+        if (libraryType.equalsIgnoreCase(BACTERIA_LIBRARY)) {
+            classification = BACTERIA_CODE;
+        } else if (libraryType.equalsIgnoreCase(FUNGI_LIBRARY)) {
+            classification = FUNGI_CODE;
         } else {
             throw new InvalidDataException("Unknown library type: " + libraryType);
         }
 
-        DnaAttributeBuilder dnaAttributeBuilder = new DnaAttributeBuilder();
-        List<String> dnaVector = dnaAttributeBuilder.createDnaVector(ntSequence);
+        List<String> dnaVector = attributeBuilder.createDnaVector(ntSequence);
         StringBuilder attributes = new StringBuilder();
         for (String dna : dnaVector) {
             attributes.append(dna);
