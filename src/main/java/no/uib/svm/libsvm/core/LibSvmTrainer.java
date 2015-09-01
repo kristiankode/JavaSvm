@@ -4,6 +4,7 @@ import no.uib.svm.libsvm.api.options.logging.Messages;
 import no.uib.svm.libsvm.core.libsvm.*;
 import no.uib.svm.libsvm.core.settings.Settings;
 import no.uib.svm.libsvm.core.settings.SettingsFactory;
+import no.uib.svm.libsvm.reading.ProblemFileReader;
 
 import java.io.*;
 import java.util.StringTokenizer;
@@ -248,16 +249,13 @@ public class LibSvmTrainer {
      * @throws IOException
      */
     public void read_problem() throws IOException {
-        Reader reader = new InputStreamReader(
-                new FileInputStream(input_file_name),settings.getSvmCharset());
-        BufferedReader fp = new BufferedReader(reader);
+        ProblemFileReader reader = new ProblemFileReader(input_file_name, settings.getSvmCharset());
         Vector<Double> vy = new Vector<Double>();
         Vector<Node[]> vx = new Vector<Node[]>();
         int max_index = 0;
 
-        while (true) {
-            String line = fp.readLine();
-            if (line == null) break;
+        String line;
+        while ((line = reader.readLine()) != null) {
 
             StringTokenizer st = new StringTokenizer(line, " \t\n\r\f:");
 
@@ -272,6 +270,8 @@ public class LibSvmTrainer {
             if (m > 0) max_index = Math.max(max_index, x[m - 1].index);
             vx.addElement(x);
         }
+        reader.close();
+
 
         prob = new Problem();
         prob.l = vy.size();
@@ -297,7 +297,7 @@ public class LibSvmTrainer {
                 }
             }
 
-        fp.close();
+
     }
 
     public void setInput_file_name(String input_file_name) {
