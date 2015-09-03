@@ -29,11 +29,9 @@ public class RowBuilder {
 
         row.append(getClassification(genome)).append(ATTR_SEPARATOR);
 
-        for (String s : getAttributeStrings(genome)) {
-            row.append(s).append(LINE_SEPARATOR);
-        }
+        getAttributeStrings(genome).forEach(row::append);
 
-        return row.toString();
+        return row.append(LINE_SEPARATOR).toString();
     }
 
     String getClassification(Genome genome) {
