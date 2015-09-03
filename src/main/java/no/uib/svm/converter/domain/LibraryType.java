@@ -1,4 +1,4 @@
-package no.uib.svm.converter.Genbank;
+package no.uib.svm.converter.domain;
 
 /**
  * @author kristian

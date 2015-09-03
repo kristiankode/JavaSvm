@@ -1,5 +1,7 @@
-package no.uib.svm.converter;
+package no.uib.svm.converter.write.attributes;
 
+import no.uib.svm.converter.domain.Genome;
+import no.uib.svm.converter.write.attributes.sequences.DnaToNumeric;
 import no.uib.svm.libsvm.core.settings.Settings;
 import no.uib.svm.libsvm.core.settings.SettingsFactory;
 import org.slf4j.Logger;
@@ -10,8 +12,8 @@ import java.util.List;
 
 import static java.lang.System.currentTimeMillis;
 
-public class DnaAttributeBuilder {
-    private static Logger log = LoggerFactory.getLogger(DnaAttributeBuilder.class);
+public class SubstringAsFeature implements AttributeBuilder {
+    private static Logger log = LoggerFactory.getLogger(SubstringAsFeature.class);
 
     public static final Settings settings = SettingsFactory.getActiveSettings();
     private static final DnaToNumeric dnaToNumeric = new DnaToNumeric(settings.getWindowSize());
@@ -25,48 +27,31 @@ public class DnaAttributeBuilder {
             "longest sequence: {}",
             UNKNOWN_SUBSTRING = "Unable to find index for {}";
 
-    public List<String> createDnaVector(String ntSequence) {
-        saveMax(ntSequence.length());
-        List<String> dnaVector = new ArrayList<>(ntSequence.length());
-        for (int i = 0; i < ntSequence.length(); i++) {
-            dnaVector.add(buildAttributeString(ntSequence, i));
+    @Override
+    public List<Double> getAttributeValues(Genome genome) {
+        List<Double> values = new ArrayList<>();
+
+        for (int i = 0; i < genome.getNtSequence().length(); i++) {
+            values.add((double) getAttributeValue(genome.getNtSequence(), i));
         }
-        counter++;
-        printInfo();
-        return dnaVector;
+
+        return values;
     }
 
     void saveMax(int length) {
-        if(length > longestDnaSequenceLength) {
+        if (length > longestDnaSequenceLength) {
             longestDnaSequenceLength = length;
         }
     }
 
-    void printInfo(){
-        if(counter % 500 == 0) {
+    void printInfo() {
+        if (counter % 500 == 0) {
             log.debug(
                     CONVERT_MSG,
                     counter,
                     currentTimeMillis() - startupTime,
                     longestDnaSequenceLength);
         }
-    }
-
-    String buildAttributeString(String ntSequence, int i) {
-        int attributeValue = this.getAttributeValue(ntSequence, i);
-        StringBuilder sb = new StringBuilder();
-
-        if (!this.attributeIsEmpty(attributeValue)) {
-            sb.append(i + 1).append(CsvSVMLight.KEY_VALUE_SEPARATOR);
-            sb.append(attributeValue);
-            sb.append(CsvSVMLight.ATTR_SEPARATOR);
-        }
-
-        return sb.toString();
-    }
-
-    boolean attributeIsEmpty(int attributeValue) {
-        return attributeValue == 0;
     }
 
     int getAttributeValue(String ntSequence, int i) {

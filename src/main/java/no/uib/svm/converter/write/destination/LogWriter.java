@@ -1,4 +1,4 @@
-package no.uib.svm.output;
+package no.uib.svm.converter.write.destination;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

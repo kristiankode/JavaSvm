@@ -37,8 +37,10 @@ public class BufferedCsvReader implements CsvReader {
         String[] row = null;
         try {
             String line = bufferedReader.readLine();
-            line = sanitizeLine(line);
-            row = convertToArray(line);
+            if (line != null) {
+                line = sanitizeLine(line);
+                row = convertToArray(line);
+            }
         } catch (IOException e) {
             log.error("Error while trying to read line: {}", e.getMessage());
         }

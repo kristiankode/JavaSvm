@@ -1,4 +1,4 @@
-package no.uib.svm.output;
+package no.uib.svm.converter.write.destination;
 
 import no.uib.svm.libsvm.core.settings.Settings;
 import no.uib.svm.libsvm.core.settings.SettingsFactory;
@@ -7,20 +7,32 @@ import org.slf4j.LoggerFactory;
 
 import java.io.*;
 
+import static java.lang.System.currentTimeMillis;
+
 /**
  * @author kristian
  *         Created 02.09.15.
  */
 public class FileWriter implements OutputWriter {
 
-    private final static String
-            KRISTIAN_TRAINING_SET = "dna.training",
-            KRISTIAN_VALIDATION_SET = "dna.validation";
+    public final static String
+            KRISTIAN_TRAINING_SET = "dnasub.training",
+            KRISTIAN_VALIDATION_SET = "dnafreq.validation";
 
     final static Logger log = LoggerFactory.getLogger(FileWriter.class);
     final BufferedWriter bufferedWriter;
     final Settings settings = SettingsFactory.getActiveSettings();
     final String filePath;
+    int counter = 0;
+    long startupTime = currentTimeMillis();
+
+    final static String
+            CONVERT_MSG = "Converted {} dna sequences in {} millis";
+
+
+    public FileWriter() throws FileNotFoundException, UnsupportedEncodingException {
+        this(KRISTIAN_TRAINING_SET);
+    }
 
     public FileWriter(String filePath) throws FileNotFoundException, UnsupportedEncodingException {
         this.filePath = filePath;
@@ -28,10 +40,21 @@ public class FileWriter implements OutputWriter {
                 new FileOutputStream(filePath), settings.getSvmCharset()));
     }
 
+    void printInfo() {
+        if (counter % 500 == 0) {
+            log.debug(
+                    CONVERT_MSG,
+                    counter,
+                    currentTimeMillis() - startupTime);
+        }
+    }
+
     @Override
     public void write(String data) {
         try {
             bufferedWriter.write(data);
+            counter++;
+            printInfo();
         } catch (IOException e) {
             log.error("Error while trying to write using reader {}, data was {}", this, data);
         }
