@@ -1,6 +1,8 @@
 package no.uib.svm.converter;
 
 import no.uib.svm.converter.Genbank.Genome;
+import no.uib.svm.converter.read.BufferedCsvReader;
+import no.uib.svm.converter.read.CsvReader;
 import no.uib.svm.libsvm.core.settings.Settings;
 import no.uib.svm.libsvm.core.settings.SettingsFactory;
 import no.uib.svm.output.OutputWriter;
@@ -71,22 +73,16 @@ public class CsvSVMLight {
     private void writeToFile(String inputFilePath) {
         try {
             /** File input **/
-            Reader reader = new InputStreamReader(
-                    new FileInputStream(inputFilePath), settings.getCsvCharset());
-            BufferedReader buffered_reader = new BufferedReader(reader);
+            CsvReader csvReader = new BufferedCsvReader(inputFilePath);
 
-            String inputLine = "";
+            String[] rowData = null;
             /** Looping through the content of a file **/
-            while ((inputLine = buffered_reader.readLine()) != null) {
-                inputLine = inputLine.replace(BLANK_SPACE_BABY, EMPTY_STRING);
-                String[] inputData = inputLine.split(COMMA_CHAMELEON);
-                if (inputData.length > 1) {
-                    Genome genome = new Genome(inputData[0], inputData[1]);
-                    substringAsFeatureWriter.writeLine(genome);
-                }
+            while ((rowData = csvReader.readNextRow()) != null) {
+                Genome genome = new Genome(rowData[0], rowData[1]);
+                substringAsFeatureWriter.writeLine(genome);
             }
             /** close bytestream **/
-            buffered_reader.close();
+            csvReader.close();
             outputWriter.close();
 
         } catch (IOException e) {
