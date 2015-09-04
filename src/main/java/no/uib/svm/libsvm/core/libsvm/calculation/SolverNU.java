@@ -32,6 +32,7 @@ final class SolverNU extends Solver {
      * @param workingSet
      * @return int 1 or 0
      */
+    @Override
     protected int selectWorkingSet(int[] workingSet)
     {
 

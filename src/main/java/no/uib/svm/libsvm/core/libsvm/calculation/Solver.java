@@ -185,7 +185,7 @@ public class Solver {
         }
 
         if (2 * nrFree < activeSize) {
-            SVM.info("\n WARNING: using -h 0 may be faster \n");
+            Svm.info("\n WARNING: using -h 0 may be faster \n");
         }
 
         if (nrFree * 1 > 2 * activeSize * (length - activeSize)) {
@@ -308,11 +308,427 @@ public class Solver {
             if (--counter == 0) {
                 counter = Math.min(length, 1000);
                 if (shrinking != 0) {
+                    doShrinking();
+                }
+                Svm.info(".");
+            }
 
+            if(selectWorkingSet(workingSet) != 0){
+                reconstructGradient();
+                activeSize = 1;
+
+                Svm.info("*");
+
+                if(selectWorkingSet(workingSet) != 0){
+                    break;
+                }else {
+                    counter = 1; // do shrinking next iteration
+                }
+            }
+
+            int i = workingSet[0];
+            int j = workingSet[1];
+
+            ++iteration;
+
+            float[] Qi = qMatrix.getQ(i, activeSize);
+            float[] Qj = qMatrix.getQ(j, activeSize);
+
+            double Ci = getC(i);
+            double Cj = getC(j);
+
+            double oldAlphaI = alpha[i];
+            double oldAlhpaJ = alpha[j];
+
+            if(yBytes[i] != yBytes[j]){
+                double quadCoef = qMatrixD[i] + qMatrixD[j] + 2*Qi[j];
+                if(quadCoef <= 0){
+                    quadCoef = 1e-12;
+                }
+                double delta = (-gradient[i]-gradient[j])/quadCoef;
+                double diff = alpha[i] - alpha[j];
+                alpha[i] += delta;
+                alpha[j] += delta;
+
+                if(diff > 0)
+                {
+                    if(alpha[j] < 0)
+                    {
+                        alpha[j] = 0;
+                        alpha[i] = diff;
+                    }
+                }
+                else
+                {
+                    if(alpha[i] < 0)
+                    {
+                        alpha[i] = 0;
+                        alpha[j] = -diff;
+                    }
+                }
+                if(diff > Ci - Cj)
+                {
+                    if(alpha[i] > Ci)
+                    {
+                        alpha[i] = Ci;
+                        alpha[j] = Ci - diff;
+                    }
+                }
+                else
+                {
+                    if(alpha[j] > Cj)
+                    {
+                        alpha[j] = Cj;
+                        alpha[i] = Cj + diff;
+                    }
+                }
+            }
+            else
+            {
+                double quad_coef = qMatrixD[i]+qMatrixD[j]-2*Qi[j];
+                if (quad_coef <= 0)
+                    quad_coef = 1e-12;
+                double delta = (gradient[i]-gradient[j])/quad_coef;
+                double sum = alpha[i] + alpha[j];
+                alpha[i] -= delta;
+                alpha[j] += delta;
+
+                if(sum > Ci)
+                {
+                    if(alpha[i] > Ci)
+                    {
+                        alpha[i] = Ci;
+                        alpha[j] = sum - Ci;
+                    }
+                }
+                else
+                {
+                    if(alpha[j] < 0)
+                    {
+                        alpha[j] = 0;
+                        alpha[i] = sum;
+                    }
+                }
+                if(sum > Cj)
+                {
+                    if(alpha[j] > Cj)
+                    {
+                        alpha[j] = Cj;
+                        alpha[i] = sum - Cj;
+                    }
+                }
+                else
+                {
+                    if(alpha[i] < 0)
+                    {
+                        alpha[i] = 0;
+                        alpha[j] = sum;
+                    }
+                }
+            }
+
+            // update G
+
+            double deltaAlphaI = alpha[i] - oldAlphaI;
+            double deltaAlphaJ = alpha[j] - oldAlhpaJ;
+
+            for(int k=0;k<activeSize;k++)
+            {
+                gradient[k] += Qi[k]*deltaAlphaI + Qj[k]*deltaAlphaJ;
+            }
+
+            // update alpha_status and G_bar
+
+            {
+                boolean ui = isUpperBound(i);
+                boolean uj = isUpperBound(j);
+                updateAlphaStatus(i);
+                updateAlphaStatus(j);
+                int k;
+                if(ui != isUpperBound(i))
+                {
+                    Qi = qMatrix.getQ(i,length);
+                    if(ui)
+                        for(k=0;k<length;k++)
+                            gradientBar[k] -= Ci * Qi[k];
+                    else
+                        for(k=0;k<length;k++)
+                            gradientBar[k] += Ci * Qi[k];
+                }
+
+                if(uj != isUpperBound(j))
+                {
+                    Qj = qMatrix.getQ(j,length);
+                    if(uj)
+                        for(k=0;k<length;k++)
+                            gradientBar[k] -= Cj * Qj[k];
+                    else
+                        for(k=0;k<length;k++)
+                            gradientBar[k] += Cj * Qj[k];
+                }
+            }
+
+        }
+
+        if(iteration >= maxIteration)
+        {
+            if(activeSize < length)
+            {
+                // reconstruct the whole gradient to calculate objective value
+                reconstructGradient();
+                activeSize = length;
+                Svm.info("*");
+            }
+            System.err.print("\nWARNING: reaching max number of iterations\n");
+        }
+
+        // calculate rho
+
+        solutionInfo.rho = calculateRho();
+
+        // calculate objective value
+        {
+            double v = 0;
+            int i;
+            for(i=0;i<length;i++)
+                v += alpha[i] * (gradient[i] + points[i]);
+
+            solutionInfo.object = v/2;
+        }
+
+        // put back the solution
+        {
+            for(int i=0;i<length;i++)
+                solveAlpha[activeSet[i]] = alpha[i];
+        }
+
+        solutionInfo.upperBoundP = CpPoint;
+        solutionInfo.upperBoundN = CnPoint;
+
+        Svm.info("\noptimization finished, #iter = "+iteration+"\n");
+    }
+
+    /**
+     * return 1 if already optimal, return 0 otherwise
+     * return i,j such that
+     * i: maximizes -y_i * grad(f)_i, i in I_up(\alpha)
+     * j: mimimizes the decrease of obj value
+     *  (if quadratic coefficeint <= 0, replace it with tau)
+     *  -y_j*grad(f)_j < -y_i*grad(f)_i, j in I_low(\alpha)
+     *
+     * @param working_set
+     * @return
+     */
+    protected int selectWorkingSet(int[] working_set){
+        double Gmax = -INF;
+        double Gmax2 = -INF;
+        int Gmax_idx = -1;
+        int Gmin_idx = -1;
+        double obj_diff_min = INF;
+
+        for(int t=0;t<activeSize;t++)
+            if(yBytes[t]==+1)
+            {
+                if(!isUpperBound(t))
+                    if(-gradient[t] >= Gmax)
+                    {
+                        Gmax = -gradient[t];
+                        Gmax_idx = t;
+                    }
+            }
+            else
+            {
+                if(!isLowerBound(t))
+                    if(gradient[t] >= Gmax)
+                    {
+                        Gmax = gradient[t];
+                        Gmax_idx = t;
+                    }
+            }
+
+        int i = Gmax_idx;
+        float[] Q_i = null;
+        if(i != -1) // null Q_i not accessed: Gmax=-INF if i=-1
+            Q_i = qMatrix.getQ(i,activeSize);
+
+        for(int j=0;j<activeSize;j++)
+        {
+            if(yBytes[j]==+1)
+            {
+                if (!isLowerBound(j))
+                {
+                    double grad_diff=Gmax+gradient[j];
+                    if (gradient[j] >= Gmax2)
+                        Gmax2 = gradient[j];
+                    if (grad_diff > 0)
+                    {
+                        double obj_diff;
+                        double quad_coef = qMatrixD[i]+qMatrixD[j]-2.0*yBytes[i]*Q_i[j];
+                        if (quad_coef > 0)
+                            obj_diff = -(grad_diff*grad_diff)/quad_coef;
+                        else
+                            obj_diff = -(grad_diff*grad_diff)/1e-12;
+
+                        if (obj_diff <= obj_diff_min)
+                        {
+                            Gmin_idx=j;
+                            obj_diff_min = obj_diff;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                if (!isUpperBound(j))
+                {
+                    double grad_diff= Gmax-gradient[j];
+                    if (-gradient[j] >= Gmax2)
+                        Gmax2 = -gradient[j];
+                    if (grad_diff > 0)
+                    {
+                        double obj_diff;
+                        double quad_coef = qMatrixD[i]+qMatrixD[j]+2.0*yBytes[i]*Q_i[j];
+                        if (quad_coef > 0)
+                            obj_diff = -(grad_diff*grad_diff)/quad_coef;
+                        else
+                            obj_diff = -(grad_diff*grad_diff)/1e-12;
+
+                        if (obj_diff <= obj_diff_min)
+                        {
+                            Gmin_idx=j;
+                            obj_diff_min = obj_diff;
+                        }
+                    }
                 }
             }
         }
+
+        if(Gmax+Gmax2 < stoppingTolerance)
+            return 1;
+
+        working_set[0] = Gmax_idx;
+        working_set[1] = Gmin_idx;
+        return 0;
     }
+
+    private boolean beShrunk(int i, double Gmax1, double Gmax2)
+    {
+        if(isUpperBound(i))
+        {
+            if(yBytes[i]==+1)
+                return(-gradient[i] > Gmax1);
+            else
+                return(-gradient[i] > Gmax2);
+        }
+        else if(isLowerBound(i))
+        {
+            if(yBytes[i]==+1)
+                return(gradient[i] > Gmax2);
+            else
+                return(gradient[i] > Gmax1);
+        }
+        else
+            return(false);
+    }
+
+    protected void doShrinking()
+    {
+        int i;
+        double Gmax1 = -INF;		// max { -y_i * grad(f)_i | i in I_up(\alpha) }
+        double Gmax2 = -INF;		// max { y_i * grad(f)_i | i in I_low(\alpha) }
+
+        // find maximal violating pair first
+        for(i=0;i<activeSize;i++)
+        {
+            if(yBytes[i]==+1)
+            {
+                if(!isUpperBound(i))
+                {
+                    if(-gradient[i] >= Gmax1)
+                        Gmax1 = -gradient[i];
+                }
+                if(!isLowerBound(i))
+                {
+                    if(gradient[i] >= Gmax2)
+                        Gmax2 = gradient[i];
+                }
+            }
+            else
+            {
+                if(!isUpperBound(i))
+                {
+                    if(-gradient[i] >= Gmax2)
+                        Gmax2 = -gradient[i];
+                }
+                if(!isLowerBound(i))
+                {
+                    if(gradient[i] >= Gmax1)
+                        Gmax1 = gradient[i];
+                }
+            }
+        }
+
+        if(unshrink == false && Gmax1 + Gmax2 <= stoppingTolerance*10)
+        {
+            unshrink = true;
+            reconstructGradient();
+            activeSize = length;
+        }
+
+        for(i=0;i<activeSize;i++)
+            if (beShrunk(i, Gmax1, Gmax2))
+            {
+                activeSize--;
+                while (activeSize > i)
+                {
+                    if (!beShrunk(activeSize, Gmax1, Gmax2))
+                    {
+                        swapIndex(i, activeSize);
+                        break;
+                    }
+                    activeSize--;
+                }
+            }
+    }
+
+    double calculateRho()
+    {
+        double r;
+        int nr_free = 0;
+        double ub = INF, lb = -INF, sum_free = 0;
+        for(int i=0;i<activeSize;i++)
+        {
+            double yG = yBytes[i]*gradient[i];
+
+            if(isLowerBound(i))
+            {
+                if(yBytes[i] > 0)
+                    ub = Math.min(ub,yG);
+                else
+                    lb = Math.max(lb,yG);
+            }
+            else if(isUpperBound(i))
+            {
+                if(yBytes[i] < 0)
+                    ub = Math.min(ub,yG);
+                else
+                    lb = Math.max(lb,yG);
+            }
+            else
+            {
+                ++nr_free;
+                sum_free += yG;
+            }
+        }
+
+        if(nr_free>0)
+            r = sum_free/nr_free;
+        else
+            r = (ub+lb)/2;
+
+        return r;
+    }
+
 
 
 }
