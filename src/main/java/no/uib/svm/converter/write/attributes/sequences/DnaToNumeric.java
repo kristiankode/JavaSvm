@@ -19,6 +19,9 @@ public class DnaToNumeric {
 
     private void generateAppropriateValues() {
         switch (windowSize) {
+            case 5:
+                dnaValues = generateUniqueGeneticListOfFive();
+                break;
             case 4:
                 dnaValues = generateUniqueGeneticListOfFour();
                 break;
@@ -113,5 +116,33 @@ public class DnaToNumeric {
             }
         }
         return doubleValues;
+    }
+
+
+    HashMap<String, Integer> generateUniqueGeneticListOfFive(){
+        HashMap<String, Integer> fiveValues = new HashMap<>();
+        int valueOfSequence = 0;
+
+        for (int i = 0; i < DnaToNumeric.INDEX_GENETIC.length(); i++) {
+            for (int j = 0; j < DnaToNumeric.INDEX_GENETIC.length(); j++) {
+                for (int k = 0; k < DnaToNumeric.INDEX_GENETIC.length(); k++) {
+                    for (int l = 0; l < DnaToNumeric.INDEX_GENETIC.length(); l++) {
+                        for (int m = 0; m < DnaToNumeric.INDEX_GENETIC.length(); m++) {
+                            valueOfSequence++;
+                            StringBuilder sb = new StringBuilder();
+                            String seq = sb
+                                    .append(INDEX_GENETIC.charAt(i))
+                                    .append(INDEX_GENETIC.charAt(j))
+                                    .append(INDEX_GENETIC.charAt(k))
+                                    .append(INDEX_GENETIC.charAt(l))
+                                    .append(INDEX_GENETIC.charAt(m))
+                                    .toString();
+                            fiveValues.put(seq, valueOfSequence);
+                        }
+                    }
+                }
+            }
+        }
+        return fiveValues;
     }
 }

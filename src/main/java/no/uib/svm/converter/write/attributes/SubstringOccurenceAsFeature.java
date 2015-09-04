@@ -19,6 +19,7 @@ import static java.math.BigDecimal.valueOf;
 import static org.apache.commons.lang.StringUtils.countMatches;
 
 public class SubstringOccurenceAsFeature implements AttributeBuilder {
+
     public static final int INITIAL_COUNT_VALUE = 0;
     private static Logger log = LoggerFactory.getLogger(SubstringOccurenceAsFeature.class);
     final Settings settings = SettingsFactory.getActiveSettings();
