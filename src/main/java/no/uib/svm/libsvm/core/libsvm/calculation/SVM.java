@@ -11,6 +11,8 @@ import java.util.StringTokenizer;
  * Created by Markus on 04.09.2015.
  */
 public class SVM {
+    public static void info(String s) {
+    }
     //
     // construct and solve various formulations
     //
