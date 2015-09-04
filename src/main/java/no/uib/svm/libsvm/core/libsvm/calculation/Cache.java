@@ -20,7 +20,7 @@ public class Cache {
     private final HeadList[] head;
     private HeadList lruHead;
 
-    Cache(int length, int size){
+    Cache(int length, long size){
         this.size = size;
         this.length = length;
         head = new HeadList[length];
