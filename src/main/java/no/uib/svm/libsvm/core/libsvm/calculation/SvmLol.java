@@ -7,7 +7,7 @@ import java.io.*;
 import java.util.Random;
 import java.util.StringTokenizer;
 
-public class Svm {
+public class SvmLol {
     //
     // construct and solve various formulations
     //
@@ -57,7 +57,7 @@ public class Svm {
             sum_alpha += alpha[i];
 
         if (Cp==Cn)
-            Svm.info("nu = " + sum_alpha / (Cp * prob.l) + "\n");
+            SvmLol.info("nu = " + sum_alpha / (Cp * prob.l) + "\n");
 
         for(i=0;i<l;i++)
             alpha[i] *= y[i];
@@ -101,17 +101,17 @@ public class Svm {
         SolverNU s = new SolverNU();
         s.Solve(l, new SvcQ(prob,param,y), zeros, y,
                 alpha, 1.0, 1.0, param.eps, si, param.shrinking);
-        double r = si.r;
+        double r = si.solutionR;
 
-        Svm.info("C = " + 1 / r + "\n");
+        SvmLol.info("C = " + 1 / r + "\n");
 
         for(i=0;i<l;i++)
             alpha[i] *= y[i]/r;
 
         si.rho /= r;
-        si.obj /= (r*r);
-        si.upper_bound_p = 1/r;
-        si.upper_bound_n = 1/r;
+        si.object /= (r*r);
+        si.upperBoundP = 1/r;
+        si.upperBoundN = 1/r;
     }
 
     private static void solve_one_class(Problem prob, SvmParameter param,
@@ -138,7 +138,7 @@ public class Svm {
         }
 
         Solver s = new Solver();
-        s.Solve(l, new ONE_CLASS_Q(prob,param), zeros, ones,
+        s.Solve(l, new OneClassQ(prob,param), zeros, ones,
                 alpha, 1.0, 1.0, param.eps, si, param.shrinking);
     }
 
@@ -163,7 +163,7 @@ public class Svm {
         }
 
         Solver s = new Solver();
-        s.Solve(2*l, new SVR_Q(prob,param), linear_term, y,
+        s.Solve(2*l, new SvrQ(prob,param), linear_term, y,
                 alpha2, param.C, param.C, param.eps, si, param.shrinking);
 
         double sum_alpha = 0;
@@ -172,7 +172,7 @@ public class Svm {
             alpha[i] = alpha2[i] - alpha2[i+l];
             sum_alpha += Math.abs(alpha[i]);
         }
-        Svm.info("nu = " + sum_alpha / (param.C * l) + "\n");
+        SvmLol.info("nu = " + sum_alpha / (param.C * l) + "\n");
     }
 
     private static void solve_nu_svr(Problem prob, SvmParameter param,
@@ -198,11 +198,11 @@ public class Svm {
             y[i+l] = -1;
         }
 
-        Solver_NU s = new Solver_NU();
-        s.Solve(2*l, new SVR_Q(prob,param), linear_term, y,
+        SolverNU s = new SolverNU();
+        s.Solve(2*l, new SvrQ(prob,param), linear_term, y,
                 alpha2, C, C, param.eps, si, param.shrinking);
 
-        Svm.info("epsilon = " + (-si.r) + "\n");
+        SvmLol.info("epsilon = " + (-si.solutionR) + "\n");
 
         for(i=0;i<l;i++)
             alpha[i] = alpha2[i] - alpha2[i+l];
@@ -242,7 +242,7 @@ public class Svm {
                 break;
         }
 
-        Svm.info("obj = " + si.obj + ", rho = " + si.rho + "\n");
+        SvmLol.info("obj = " + si.object + ", rho = " + si.rho + "\n");
 
         // output SVs
 
@@ -255,18 +255,18 @@ public class Svm {
                 ++nSV;
                 if(prob.y[i] > 0)
                 {
-                    if(Math.abs(alpha[i]) >= si.upper_bound_p)
+                    if(Math.abs(alpha[i]) >= si.upperBoundP)
                         ++nBSV;
                 }
                 else
                 {
-                    if(Math.abs(alpha[i]) >= si.upper_bound_n)
+                    if(Math.abs(alpha[i]) >= si.upperBoundN)
                         ++nBSV;
                 }
             }
         }
 
-        Svm.info("nSV = " + nSV + ", nBSV = " + nBSV + "\n");
+        SvmLol.info("nSV = " + nSV + ", nBSV = " + nBSV + "\n");
 
         decision_function f = new decision_function();
         f.alpha = alpha;
@@ -378,13 +378,13 @@ public class Svm {
 
             if (stepsize < min_step)
             {
-                Svm.info("Line search fails in two-class probability estimates\n");
+                SvmLol.info("Line search fails in two-class probability estimates\n");
                 break;
             }
         }
 
         if (iter>=max_iter)
-            Svm.info("Reaching maximal iterations in two-class probability estimates\n");
+            SvmLol.info("Reaching maximal iterations in two-class probability estimates\n");
         probAB[0]=A;probAB[1]=B;
     }
 
@@ -454,7 +454,7 @@ public class Svm {
             }
         }
         if (iter>=max_iter)
-            Svm.info("Exceeds max_iter in multiclass_prob\n");
+            SvmLol.info("Exceeds max_iter in multiclass_prob\n");
     }
 
     // Cross-validation decision values for probability estimates
@@ -564,7 +564,7 @@ public class Svm {
             else
                 mae+=Math.abs(ymv[i]);
         mae /= (prob.l-count);
-        Svm.info("Prob. model for test data: target value = predicted value + z,\nz: Laplace distribution e^(-|z|/sigma)/(2sigma),sigma=" + mae + "\n");
+        SvmLol.info("Prob. model for test data: target value = predicted value + z,\nz: Laplace distribution e^(-|z|/sigma)/(2sigma),sigma=" + mae + "\n");
         return mae;
     }
 
@@ -715,7 +715,7 @@ public class Svm {
             int[] count = tmp_count[0];
 
             if(nr_class == 1)
-                Svm.info("WARNING: training data in only one class. See README for details.\n");
+                SvmLol.info("WARNING: training data in only one class. See README for details.\n");
 
             Node[][] x = new Node[l][];
             int i;
@@ -837,7 +837,7 @@ public class Svm {
                 nz_count[i] = nSV;
             }
 
-            Svm.info("Total nSV = " + nnz + "\n");
+            SvmLol.info("Total nSV = " + nnz + "\n");
 
             model.l = nnz;
             model.SV = new Node[nnz][];
@@ -1049,7 +1049,7 @@ public class Svm {
             double[] sv_coef = model.getSv_coef()[0];
             double sum = 0;
             for(i=0;i<model.getL();i++)
-                sum += sv_coef[i] * Kernel.k_function(x,model.getSV()[i],model.getParam());
+                sum += sv_coef[i] * Kernel.kFunction(x, model.getSV()[i], model.getParam());
             sum -= model.getRho()[0];
             dec_values[0] = sum;
 
@@ -1065,7 +1065,7 @@ public class Svm {
 
             double[] kvalue = new double[l];
             for(i=0;i<l;i++)
-                kvalue[i] = Kernel.k_function(x,model.getSV()[i],model.getParam());
+                kvalue[i] = Kernel.kFunction(x, model.getSV()[i], model.getParam());
 
             int[] start = new int[nr_class];
             start[0] = 0;
