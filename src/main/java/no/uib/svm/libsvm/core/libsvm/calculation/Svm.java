@@ -7,7 +7,7 @@ import java.io.*;
 import java.util.Random;
 import java.util.StringTokenizer;
 
-public class SvmLol {
+public class Svm {
     //
     // construct and solve various formulations
     //
@@ -57,7 +57,7 @@ public class SvmLol {
             sum_alpha += alpha[i];
 
         if (Cp==Cn)
-            SvmLol.info("nu = " + sum_alpha / (Cp * prob.l) + "\n");
+            Svm.info("nu = " + sum_alpha / (Cp * prob.l) + "\n");
 
         for(i=0;i<l;i++)
             alpha[i] *= y[i];
@@ -103,7 +103,7 @@ public class SvmLol {
                 alpha, 1.0, 1.0, param.eps, si, param.shrinking);
         double r = si.solutionR;
 
-        SvmLol.info("C = " + 1 / r + "\n");
+        Svm.info("C = " + 1 / r + "\n");
 
         for(i=0;i<l;i++)
             alpha[i] *= y[i]/r;
@@ -172,7 +172,7 @@ public class SvmLol {
             alpha[i] = alpha2[i] - alpha2[i+l];
             sum_alpha += Math.abs(alpha[i]);
         }
-        SvmLol.info("nu = " + sum_alpha / (param.C * l) + "\n");
+        Svm.info("nu = " + sum_alpha / (param.C * l) + "\n");
     }
 
     private static void solve_nu_svr(Problem prob, SvmParameter param,
@@ -202,7 +202,7 @@ public class SvmLol {
         s.Solve(2*l, new SvrQ(prob,param), linear_term, y,
                 alpha2, C, C, param.eps, si, param.shrinking);
 
-        SvmLol.info("epsilon = " + (-si.solutionR) + "\n");
+        Svm.info("epsilon = " + (-si.solutionR) + "\n");
 
         for(i=0;i<l;i++)
             alpha[i] = alpha2[i] - alpha2[i+l];
@@ -242,7 +242,7 @@ public class SvmLol {
                 break;
         }
 
-        SvmLol.info("obj = " + si.object + ", rho = " + si.rho + "\n");
+        Svm.info("obj = " + si.object + ", rho = " + si.rho + "\n");
 
         // output SVs
 
@@ -266,7 +266,7 @@ public class SvmLol {
             }
         }
 
-        SvmLol.info("nSV = " + nSV + ", nBSV = " + nBSV + "\n");
+        Svm.info("nSV = " + nSV + ", nBSV = " + nBSV + "\n");
 
         decision_function f = new decision_function();
         f.alpha = alpha;
@@ -378,13 +378,13 @@ public class SvmLol {
 
             if (stepsize < min_step)
             {
-                SvmLol.info("Line search fails in two-class probability estimates\n");
+                Svm.info("Line search fails in two-class probability estimates\n");
                 break;
             }
         }
 
         if (iter>=max_iter)
-            SvmLol.info("Reaching maximal iterations in two-class probability estimates\n");
+            Svm.info("Reaching maximal iterations in two-class probability estimates\n");
         probAB[0]=A;probAB[1]=B;
     }
 
@@ -454,7 +454,7 @@ public class SvmLol {
             }
         }
         if (iter>=max_iter)
-            SvmLol.info("Exceeds max_iter in multiclass_prob\n");
+            Svm.info("Exceeds max_iter in multiclass_prob\n");
     }
 
     // Cross-validation decision values for probability estimates
@@ -564,7 +564,7 @@ public class SvmLol {
             else
                 mae+=Math.abs(ymv[i]);
         mae /= (prob.l-count);
-        SvmLol.info("Prob. model for test data: target value = predicted value + z,\nz: Laplace distribution e^(-|z|/sigma)/(2sigma),sigma=" + mae + "\n");
+        Svm.info("Prob. model for test data: target value = predicted value + z,\nz: Laplace distribution e^(-|z|/sigma)/(2sigma),sigma=" + mae + "\n");
         return mae;
     }
 
@@ -715,7 +715,7 @@ public class SvmLol {
             int[] count = tmp_count[0];
 
             if(nr_class == 1)
-                SvmLol.info("WARNING: training data in only one class. See README for details.\n");
+                Svm.info("WARNING: training data in only one class. See README for details.\n");
 
             Node[][] x = new Node[l][];
             int i;
@@ -837,7 +837,7 @@ public class SvmLol {
                 nz_count[i] = nSV;
             }
 
-            SvmLol.info("Total nSV = " + nnz + "\n");
+            Svm.info("Total nSV = " + nnz + "\n");
 
             model.l = nnz;
             model.SV = new Node[nnz][];
