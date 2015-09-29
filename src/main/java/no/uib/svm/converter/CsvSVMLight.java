@@ -22,7 +22,7 @@ public class CsvSVMLight {
             INPUT_FILE = "/Users/kristianhestetun/Utvikling/MachineLearning/JavaSVM/200k.csv";
 
     private OutputWriter outputWriter = WriterFactory.getWriter();
-    private AttributeBuilder attributeBuilder = new SubstringAsFeature();
+    private AttributeBuilder attributeBuilder = new SubstringOccurenceAsFeature();
 
     public CsvSVMLight()
             throws FileNotFoundException, UnsupportedEncodingException {
