@@ -7,7 +7,7 @@ import java.util.HashMap;
 
 public class DnaToNumeric {
     static final Logger log = LoggerFactory.getLogger(DnaToNumeric.class);
-    static final String INDEX_GENETIC = "TGCARNMKYSWDH";
+    static final String INDEX_GENETIC = "ACGTRYKMSWBDHVN";
     private HashMap<String, Integer> dnaValues;
 
     private final int windowSize;
