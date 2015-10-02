@@ -1,8 +1,7 @@
 package no.uib.svm.converter.domain;
 
 /**
- * @author kristian
- *         Created 02.09.15.
+ * Class representing the genome data to convert.
  */
 public class Genome {
 

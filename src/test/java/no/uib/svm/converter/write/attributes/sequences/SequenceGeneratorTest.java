@@ -11,15 +11,15 @@ import static org.junit.Assert.assertEquals;
  * @author kristian
  *         Created 03.09.15.
  */
-public class SequenceGeneratorImplTest {
+public class SequenceGeneratorTest {
 
-    SequenceGeneratorImpl instance = new SequenceGeneratorImpl();
+    SequenceGenerator instance = new SequenceGenerator();
 
     @Test
     public void allPossible_withLength1_shouldBeEqualToNumberOfCharacters() {
 
         HashSet<String> result = instance.getAllPossibleCombinationsOfLength(1);
-        int expected = SequenceGeneratorImpl.DNA_CHARACTERS.length(),
+        int expected = SequenceGenerator.DNA_CHARACTERS.length(),
                 actual = result.size();
 
         assertEquals(expected, actual);
@@ -29,7 +29,7 @@ public class SequenceGeneratorImplTest {
     public void allPossible_withLength2_shouldBeEqualToDnaCharsToThePowerOf2() {
 
         HashSet<String> result = instance.getAllPossibleCombinationsOfLength(2);
-        int expected = powerOf(SequenceGeneratorImpl.DNA_CHARACTERS.length(), 2),
+        int expected = powerOf(SequenceGenerator.DNA_CHARACTERS.length(), 2),
                 actual = result.size();
 
         assertEquals(expected, actual);
@@ -39,7 +39,7 @@ public class SequenceGeneratorImplTest {
     public void allPossible_withLength3_shouldBeEqualToDnaCharsToThePowerOf3() {
 
         HashSet<String> result = instance.getAllPossibleCombinationsOfLength(3);
-        int expected = powerOf(SequenceGeneratorImpl.DNA_CHARACTERS.length(), 3),
+        int expected = powerOf(SequenceGenerator.DNA_CHARACTERS.length(), 3),
                 actual = result.size();
 
         assertEquals(expected, actual);

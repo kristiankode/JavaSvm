@@ -8,8 +8,7 @@ import org.slf4j.LoggerFactory;
 import java.io.*;
 
 /**
- * @author kristian
- *         Created 03.09.15.
+ * Reads a csv file using a buffered reader. Takes input path as argument, produces a reader that can readNextLine().
  */
 public class BufferedCsvReader implements CsvReader {
     private final static Logger log = LoggerFactory.getLogger(BufferedCsvReader.class);
@@ -23,6 +22,12 @@ public class BufferedCsvReader implements CsvReader {
             COMMA_CHAMELEON = ",",
             EMPTY_STRING = "";
 
+    /**
+     * Takes input path as argument, produces a reader that can readNextLine().
+     * @param inputFilePath The file path of the CSV file.
+     * @throws FileNotFoundException
+     * @throws UnsupportedEncodingException
+     */
     public BufferedCsvReader(String inputFilePath)
             throws FileNotFoundException, UnsupportedEncodingException {
         this.inputFilePath = inputFilePath;

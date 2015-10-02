@@ -7,8 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * @author kristian
- *         Created 03.09.15.
+ * Creates a row on SVM-light format.
  */
 public class RowBuilder {
 
@@ -24,6 +23,12 @@ public class RowBuilder {
         this.attributeBuilder = attributeBuilder;
     }
 
+    /**
+     * Creates a row on SVM-light format that represents a single Genome.
+     *
+     * @param genome The Nt-sequence and Library type.
+     * @return String representing the row.
+     */
     public String buildRow(Genome genome) {
         StringBuilder row = new StringBuilder();
 

@@ -10,14 +10,9 @@ import java.io.*;
 import static java.lang.System.currentTimeMillis;
 
 /**
- * @author kristian
- *         Created 02.09.15.
+ * Writes output to file.
  */
-public class FileWriter implements OutputWriter {
-
-    public final static String
-            KRISTIAN_TRAINING_SET = "dnasub.training",
-            KRISTIAN_VALIDATION_SET = "dnafreq.validation";
+public class FileWriter {
 
     final static Logger log = LoggerFactory.getLogger(FileWriter.class);
     final BufferedWriter bufferedWriter;
@@ -30,26 +25,12 @@ public class FileWriter implements OutputWriter {
             CONVERT_MSG = "Converted {} dna sequences in {} millis";
 
 
-    public FileWriter() throws FileNotFoundException, UnsupportedEncodingException {
-        this(KRISTIAN_TRAINING_SET);
-    }
-
     public FileWriter(String filePath) throws FileNotFoundException, UnsupportedEncodingException {
         this.filePath = filePath;
         this.bufferedWriter = new BufferedWriter(new OutputStreamWriter(
                 new FileOutputStream(filePath), settings.getSvmCharset()));
     }
 
-    void printInfo() {
-        if (counter % 500 == 0) {
-            log.debug(
-                    CONVERT_MSG,
-                    counter,
-                    currentTimeMillis() - startupTime);
-        }
-    }
-
-    @Override
     public void write(String data) {
         try {
             bufferedWriter.write(data);
@@ -60,13 +41,21 @@ public class FileWriter implements OutputWriter {
         }
     }
 
-    @Override
     public void close() {
         try {
             bufferedWriter.close();
             log.info("File saved as {}", filePath);
         } catch (IOException e) {
             log.error("Unable to close writer {}", bufferedWriter);
+        }
+    }
+
+    void printInfo() {
+        if (counter % 500 == 0) {
+            log.debug(
+                    CONVERT_MSG,
+                    counter,
+                    currentTimeMillis() - startupTime);
         }
     }
 }

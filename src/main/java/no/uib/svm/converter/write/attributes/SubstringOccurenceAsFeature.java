@@ -2,7 +2,6 @@ package no.uib.svm.converter.write.attributes;
 
 import no.uib.svm.converter.domain.Genome;
 import no.uib.svm.converter.write.attributes.sequences.SequenceGenerator;
-import no.uib.svm.converter.write.attributes.sequences.SequenceGeneratorImpl;
 import no.uib.svm.libsvm.core.settings.Settings;
 import no.uib.svm.libsvm.core.settings.SettingsFactory;
 import org.slf4j.Logger;
@@ -24,7 +23,7 @@ public class SubstringOccurenceAsFeature implements AttributeBuilder {
     private static Logger log = LoggerFactory.getLogger(SubstringOccurenceAsFeature.class);
     final Settings settings = SettingsFactory.getActiveSettings();
 
-    SequenceGenerator seqGen = new SequenceGeneratorImpl();
+    SequenceGenerator seqGen = new SequenceGenerator();
     HashSet<String> allPossibleCombos = seqGen.getAllPossibleCombinationsOfLength(settings.getWindowSize());
     HashMap<String, Integer> buckets;
 
