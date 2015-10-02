@@ -17,6 +17,7 @@ import java.io.UnsupportedEncodingException;
  */
 public class CsvSVMLight {
 
+    // which attribute builder to use; SubstringOccurenceAsFeature or SubstringAsFeature.
     private AttributeBuilder attributeBuilder = new SubstringOccurrenceAsFeature();
 
     /**
@@ -38,7 +39,8 @@ public class CsvSVMLight {
     /**
      * Converts a svm-file to SvmLight-format
      *
-     * @param inputFilePath Path to csv file
+     * @param inputFilePath Path to csv file.
+     * @param outputPath    Path to write svmLight file to.
      */
     private void convertToSvmFormat(String inputFilePath, String outputPath) {
         try {
