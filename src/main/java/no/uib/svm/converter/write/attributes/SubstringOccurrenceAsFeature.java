@@ -17,17 +17,20 @@ import static java.math.BigDecimal.ROUND_HALF_UP;
 import static java.math.BigDecimal.valueOf;
 import static org.apache.commons.lang.StringUtils.countMatches;
 
-public class SubstringOccurenceAsFeature implements AttributeBuilder {
+/**
+ * Counts the number of times a substring occurs in a string.
+ */
+public class SubstringOccurrenceAsFeature implements AttributeBuilder {
 
     public static final int INITIAL_COUNT_VALUE = 0;
-    private static Logger log = LoggerFactory.getLogger(SubstringOccurenceAsFeature.class);
+    private static Logger log = LoggerFactory.getLogger(SubstringOccurrenceAsFeature.class);
     final Settings settings = SettingsFactory.getActiveSettings();
 
     SequenceGenerator seqGen = new SequenceGenerator();
     HashSet<String> allPossibleCombos = seqGen.getAllPossibleCombinationsOfLength(settings.getWindowSize());
     HashMap<String, Integer> buckets;
 
-    public SubstringOccurenceAsFeature() {
+    public SubstringOccurrenceAsFeature() {
         initBuckets();
     }
 
