@@ -1,6 +1,5 @@
 package no.uib.svm.converter.read;
 
-import no.uib.svm.libsvm.core.settings.Settings;
 import no.uib.svm.libsvm.core.settings.SettingsFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,7 +13,6 @@ public class BufferedCsvReader implements CsvReader {
     private final static Logger log = LoggerFactory.getLogger(BufferedCsvReader.class);
 
     final String inputFilePath;
-    final Settings settings = SettingsFactory.getActiveSettings();
     final BufferedReader bufferedReader;
 
     public static final String
@@ -24,16 +22,31 @@ public class BufferedCsvReader implements CsvReader {
 
     /**
      * Takes input path as argument, produces a reader that can readNextLine().
+     * Uses default encoding (from settings).
+     *
      * @param inputFilePath The file path of the CSV file.
      * @throws FileNotFoundException
      * @throws UnsupportedEncodingException
      */
     public BufferedCsvReader(String inputFilePath)
             throws FileNotFoundException, UnsupportedEncodingException {
+        this(inputFilePath, SettingsFactory.getActiveSettings().getCsvCharset());
+    }
+
+    /**
+     * Takes input path as argument, produces a reader that can readNextLine().
+     *
+     * @param inputFilePath The file path of the CSV file.
+     * @param encoding      Encoding of the file to read.
+     * @throws FileNotFoundException
+     * @throws UnsupportedEncodingException
+     */
+    public BufferedCsvReader(String inputFilePath, String encoding)
+            throws FileNotFoundException, UnsupportedEncodingException {
         this.inputFilePath = inputFilePath;
 
         Reader reader = new InputStreamReader(
-                new FileInputStream(inputFilePath), settings.getCsvCharset());
+                new FileInputStream(inputFilePath), encoding);
         bufferedReader = new BufferedReader(reader);
     }
 
