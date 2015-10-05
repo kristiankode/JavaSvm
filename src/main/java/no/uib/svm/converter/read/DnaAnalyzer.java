@@ -6,13 +6,9 @@ import org.slf4j.LoggerFactory;
 import java.io.FileNotFoundException;
 import java.io.UnsupportedEncodingException;
 import java.text.NumberFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
-import static java.math.BigDecimal.ROUND_HALF_UP;
-import static java.math.BigDecimal.valueOf;
+import static java.math.BigDecimal.*;
 
 /**
  * Program for evaluating the Virus.csv-file.
@@ -117,6 +113,19 @@ public class DnaAnalyzer {
             }
         }
 
+        private Double calculateAvgNumberOfSamples() {
+            return valueOf(rows).divide(valueOf(specieCount.size()), 10, ROUND_HALF_UP).doubleValue();
+        }
+
+        private Integer calcMeanNumberOfSamples() {
+            List<Integer> counts = new ArrayList<>(specieCount.values());
+            Collections.sort(counts);
+
+            Integer meanIndex = valueOf(counts.size()).divide(valueOf(2), 4, ROUND_FLOOR).intValue();
+
+            return counts.get(meanIndex);
+        }
+
         public void countSpecie(String specie) {
             int newCount;
             if (specieCount.containsKey(specie)) {
@@ -134,6 +143,8 @@ public class DnaAnalyzer {
 
             result.numberOfRows = rows;
             result.numberOfSpecies = specieCount.size();
+            result.avgSampleSize = calculateAvgNumberOfSamples();
+            result.meanSampleSize = calcMeanNumberOfSamples();
             result.minSequenceLength = minSeqLength;
             result.maxSequenceLength = maxSeqLength;
             result.avgSequenceLength = calcAvgSeqLength();
@@ -152,18 +163,20 @@ public class DnaAnalyzer {
                 maxSequenceLength,
                 maxNumberOfOneSpecie;
 
-        Double avgSequenceLength;
+        Double avgSequenceLength, avgSampleSize;
         String mostCommonSpecie;
+        public Integer meanSampleSize;
 
 
         public void print() {
             print("-------------- Analysis result -------------");
-            print("Number of rows:          " + readable(numberOfRows));
-            print("Number of species:       " + readable(numberOfSpecies));
-            print("Most common specie:      " + mostCommonSpecie + " (" + readable(maxNumberOfOneSpecie) + " samples)");
-            print("Minimum seq. length:     " + readable(minSequenceLength));
-            print("Maximum seq. length:     " + readable(maxSequenceLength));
-            print("Average. seq. length:    " + readable(avgSequenceLength));
+            print("Number of rows:                      " + readable(numberOfRows));
+            print("Number of species:                   " + readable(numberOfSpecies));
+            print("Avg number of samples pr specie:     " + readable(avgSampleSize) +" (mean: " + meanSampleSize + ")");
+            print("Most common specie:                  " + mostCommonSpecie + " (" + readable(maxNumberOfOneSpecie) + " samples)");
+            print("Minimum seq. length:                 " + readable(minSequenceLength));
+            print("Maximum seq. length:                 " + readable(maxSequenceLength));
+            print("Average. seq. length:                " + readable(avgSequenceLength));
         }
 
         private String readable(Number number) {
