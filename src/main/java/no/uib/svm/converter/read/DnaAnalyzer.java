@@ -62,6 +62,9 @@ public class DnaAnalyzer {
         return counter.getResult();
     }
 
+    /**
+     * Class keeping track of the numbers.
+     */
     private class DnaCounter {
         HashMap<String, Integer> specieCount = new HashMap<>();
         List<Integer> sequenceLengths = new ArrayList<>();
@@ -155,6 +158,9 @@ public class DnaAnalyzer {
         }
     }
 
+    /**
+     * Class representing the results.
+     */
     private class AnalysisResult {
         int
                 numberOfRows,
