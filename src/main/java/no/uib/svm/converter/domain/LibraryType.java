@@ -6,7 +6,7 @@ package no.uib.svm.converter.domain;
  */
 public enum LibraryType {
 
-    FUNGI(-1), BACTERIA(1);
+    FUNGI(-1), BACTERIA(1), VIRUS(-1);
 
     final int code;
 

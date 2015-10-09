@@ -21,10 +21,10 @@ public class VirusConverter {
         numberOfVirus = Integer.parseInt(args[1]);
         String filepath = args[2];
         VirusConverter vc = new VirusConverter();
-        vc.createvirusfile(filename, filepath);
+        vc.createVirusFile(filename, filepath);
     }
 
-    private void createvirusfile(String filename, String filepath) {
+    private void createVirusFile(String filename, String filepath) {
         try {
             BufferedWriter writer = new BufferedWriter(new FileWriter(filepath + numberOfVirus + "Virus.csv"));
             BufferedCsvReader reader = new BufferedCsvReader(filename, virusFileEncoding);

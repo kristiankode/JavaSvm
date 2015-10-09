@@ -38,7 +38,7 @@ public class ProblemFileReader {
     }
 
     private double convertToMegabytes(int bytes) {
-        return bytes / 1048576;
+        return ((double)bytes / 1048576);
     }
 
 
