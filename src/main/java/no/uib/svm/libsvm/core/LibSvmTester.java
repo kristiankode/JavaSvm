@@ -98,11 +98,11 @@ public class LibSvmTester {
             if(v == 1.0 && target == 1.0)
                 truePositive++;
             if(v == 1.0 && target == -1.0)
-                trueNegative++;
-            if(v == -1.0 && target == 1.0)
                 falsePositive++;
-            if(v == -1.0 && target == -1.0)
+            if(v == -1.0 && target == 1.0)
                 falseNegative++;
+            if(v == -1.0 && target == -1.0)
+                trueNegative++;
             if (v == target)
                 ++correct;
 
