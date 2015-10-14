@@ -14,6 +14,10 @@ public class LibSvmTester {
 
     private static int sensitivity = 0;
     private static int specificity = 0;
+    private static int falsePositive = 0;
+    private static int truePositive = 0;
+    private static int falseNegeative = 0;
+    private static int trueNegative = 0;
     private static final Settings settings = SettingsFactory.getActiveSettings();
 
     private static PrintInterface svm_print_null = new PrintInterface() {
