@@ -12,12 +12,9 @@ import java.util.StringTokenizer;
  */
 public class LibSvmTester {
 
-    private static int sensitivity = 0;
-    private static int specificity = 0;
-    private static int falsePositive = 0;
-    private static int truePositive = 0;
-    private static int falseNegeative = 0;
-    private static int trueNegative = 0;
+    private static double sensitivity = 0;
+    private static double specificity = 0;
+    private static int truePositive, falseNegative, falsePositive, trueNegative;
     private static final Settings settings = SettingsFactory.getActiveSettings();
 
     private static PrintInterface svm_print_null = new PrintInterface() {
@@ -98,9 +95,17 @@ public class LibSvmTester {
                 v = svm.svm_predict(model, x);
                 output.writeBytes(v + "\n");
             }
-
+            if(v == 1.0 && target == 1.0)
+                truePositive++;
+            if(v == 1.0 && target == -1.0)
+                trueNegative++;
+            if(v == -1.0 && target == 1.0)
+                falsePositive++;
+            if(v == -1.0 && target == -1.0)
+                falseNegative++;
             if (v == target)
                 ++correct;
+
             error += (v - target) * (v - target);
             sumv += v;
             sumy += target;
@@ -116,9 +121,14 @@ public class LibSvmTester {
                     ((total * sumvy - sumv * sumy) * (total * sumvy - sumv * sumy)) /
                             ((total * sumvv - sumv * sumv) * (total * sumyy - sumy * sumy)) +
                     " (regression)\n");
-        } else
+        } else {
             LibSvmTester.info("Accuracy = " + (double) correct / total * 100 +
                     "% (" + correct + "/" + total + ") (classification)\n");
+            sensitivity = ((double)truePositive / (truePositive + falseNegative));
+            specificity = ((double)trueNegative /(trueNegative + falsePositive));
+            LibSvmTester.info("Sensitivity = " + sensitivity + "\n");
+            LibSvmTester.info("Specificity = " + specificity + "\n");
+        }
     }
 
     private static void exit_with_help() {
