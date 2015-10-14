@@ -4,6 +4,7 @@ import no.uib.svm.converter.domain.Genome;
 import no.uib.svm.converter.read.BufferedCsvReader;
 import no.uib.svm.converter.read.CsvReader;
 import no.uib.svm.converter.write.attributes.AttributeBuilder;
+import no.uib.svm.converter.write.attributes.SubstringAsFeature;
 import no.uib.svm.converter.write.attributes.SubstringOccurrenceAsFeature;
 import no.uib.svm.converter.write.destination.FileWriter;
 import no.uib.svm.converter.write.row.RowBuilder;
@@ -18,7 +19,7 @@ import java.io.UnsupportedEncodingException;
 public class CsvSVMLight {
 
     // which attribute builder to use; SubstringOccurenceAsFeature or SubstringAsFeature.
-    private AttributeBuilder attributeBuilder = new SubstringOccurrenceAsFeature();
+    private AttributeBuilder attributeBuilder = new SubstringAsFeature();
 
     /**
      * Starts the program with input and output arguments.

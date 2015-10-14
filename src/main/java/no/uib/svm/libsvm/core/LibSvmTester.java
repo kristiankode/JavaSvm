@@ -12,6 +12,8 @@ import java.util.StringTokenizer;
  */
 public class LibSvmTester {
 
+    private static int sensitivity = 0;
+    private static int specificity = 0;
     private static final Settings settings = SettingsFactory.getActiveSettings();
 
     private static PrintInterface svm_print_null = new PrintInterface() {
